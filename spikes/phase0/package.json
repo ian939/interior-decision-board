@@ -1,0 +1,11 @@
+{
+  "name": "interior-decision-phase0-spikes",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "verify:claude": "node verify-claude.mjs",
+    "verify:sources": "node verify-sources.mjs",
+    "verify:telegram": "node verify-telegram.mjs",
+    "serve": "node probe-server.mjs"
+  }
+}

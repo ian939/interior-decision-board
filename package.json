@@ -1,0 +1,32 @@
+{
+  "name": "interior-decision-board",
+  "private": true,
+  "version": "0.1.0",
+  "description": "부부를 위한 인테리어 소스 수집 및 공동 의사결정 보드",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,web -c green,cyan \"npm run dev -w @interior/server\" \"npm run dev -w @interior/web\"",
+    "dev:server": "npm run dev -w @interior/server",
+    "dev:web": "npm run dev -w @interior/web",
+    "build": "npm run build -w @interior/shared && npm run build -w @interior/server && npm run build -w @interior/web",
+    "backup": "node scripts/backup.mjs",
+    "test": "vitest run",
+    "test:e2e": "node scripts/e2e.mjs",
+    "test:watch": "vitest",
+    "typecheck": "npm run typecheck -w @interior/shared && npm run typecheck -w @interior/server && npm run typecheck -w @interior/web"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.0",
+    "concurrently": "^9.2.1",
+    "playwright-core": "^1.56.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.3"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}

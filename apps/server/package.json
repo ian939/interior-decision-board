@@ -1,0 +1,21 @@
+{
+  "name": "@interior/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.1.0",
+    "@fastify/multipart": "^9.2.1",
+    "@fastify/rate-limit": "^10.3.0",
+    "@interior/shared": "*",
+    "fastify": "^5.6.1",
+    "grammy": "^1.38.3",
+    "zod": "^4.1.12"
+  }
+}
