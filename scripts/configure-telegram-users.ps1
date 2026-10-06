@@ -10,20 +10,32 @@ if (-not (Test-Path -LiteralPath $EnvPath)) { throw '.env 파일이 없습니다
 
 $SecureToken = Read-Host 'BotFather에서 재발급한 Telegram bot token' -AsSecureString
 $Pointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureToken)
-try { $Token = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($Pointer) } finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Pointer) }
+try { $Token = ([Runtime.InteropServices.Marshal]::PtrToStringBSTR($Pointer)).Trim() } finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Pointer) }
 if (-not $Token) { throw 'Telegram bot token이 필요합니다.' }
+if ($Token -notmatch '^\d{8,12}:[A-Za-z0-9_-]{30,}$') { throw 'Telegram bot token 형식이 올바르지 않습니다. BotFather가 보낸 토큰 문자열만 붙여넣으세요.' }
 
 try {
   $Bot = Invoke-RestMethod -Method Get -Uri ("https://api.telegram.org/bot{0}/getMe" -f $Token) -TimeoutSec 15
   if (-not $Bot.ok) { throw 'invalid bot' }
   Write-Host "연결할 봇: @$($Bot.result.username)" -ForegroundColor Cyan
+} catch {
+  throw 'Telegram 토큰 검증에 실패했습니다. 현재 토큰을 폐기하고 BotFather에서 새로 발급한 토큰인지 확인하세요.'
+}
+
+try {
+  $Webhook = Invoke-RestMethod -Method Get -Uri ("https://api.telegram.org/bot{0}/getWebhookInfo" -f $Token) -TimeoutSec 15
+  if ($Webhook.result.url) {
+    Write-Host '기존 Telegram webhook을 해제합니다.' -ForegroundColor Yellow
+    $Deleted = Invoke-RestMethod -Method Post -Uri ("https://api.telegram.org/bot{0}/deleteWebhook" -f $Token) -Body @{ drop_pending_updates = 'false' } -TimeoutSec 15
+    if (-not $Deleted.ok) { throw 'deleteWebhook failed' }
+  }
   $Updates = Invoke-RestMethod -Method Get -Uri ("https://api.telegram.org/bot{0}/getUpdates" -f $Token) -TimeoutSec 15
   $Candidates = @($Updates.result |
     ForEach-Object { if ($_.message -and $_.message.from) { $_.message.from } elseif ($_.my_chat_member -and $_.my_chat_member.from) { $_.my_chat_member.from } } |
     Where-Object { $_ -and $_.id } |
     Sort-Object id -Unique)
 } catch {
-  throw 'Telegram 연결에 실패했습니다. 새 토큰을 확인하세요.'
+  throw 'Telegram 사용자 조회에 실패했습니다. 두 분 모두 /start를 보냈는지 확인하고 다시 실행하세요.'
 }
 if ($Candidates.Count -lt 2) { throw '두 분 모두 새 봇의 개인 채팅에서 /start를 보낸 뒤 다시 실행하세요.' }
 Write-Host '발견한 Telegram 사용자:' -ForegroundColor Cyan
