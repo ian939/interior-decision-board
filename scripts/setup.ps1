@@ -26,6 +26,16 @@ function Read-PlainPassword([string]$Prompt) {
   }
 }
 
+function Read-OptionalSecret([string]$Prompt) {
+  $SecureValue = Read-Host $Prompt -AsSecureString
+  $Pointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureValue)
+  try {
+    return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($Pointer)
+  } finally {
+    [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($Pointer)
+  }
+}
+
 function Quote-Env([string]$Value) {
   return '"' + $Value.Replace('\', '\\').Replace('"', '\"') + '"'
 }
@@ -34,12 +44,11 @@ $OwnerName = Read-RequiredText '본인 표시 이름' '나'
 $OwnerPassword = Read-PlainPassword '본인 비밀번호 (8자 이상)'
 $PartnerName = Read-RequiredText '배우자 표시 이름' '배우자'
 $PartnerPassword = Read-PlainPassword '배우자 비밀번호 (8자 이상)'
-$PublicWebUrl = Read-RequiredText '최종 GitHub Pages URL (아직 없으면 로컬 주소)' 'http://localhost:5173'
-$ApiOrigin = Read-RequiredText '로컬 API의 공개 HTTPS Origin (아직 없으면 로컬 주소)' 'http://127.0.0.1:8787'
-$TelegramToken = Read-Host 'Telegram bot token (나중에 설정하려면 Enter)'
+$PublicWebUrl = Read-RequiredText 'GitHub Pages URL' 'https://ian939.github.io/interior-decision-board/'
+$GitHubRepository = Read-RequiredText 'GitHub 저장소' 'ian939/interior-decision-board'
+$TelegramToken = Read-OptionalSecret 'Telegram bot token (화면에 표시되지 않음, 나중에 설정하려면 Enter)'
 $TelegramOwnerId = Read-Host '본인 Telegram numeric user ID (나중에 설정하려면 Enter)'
 $TelegramPartnerId = Read-Host '배우자 Telegram numeric user ID (나중에 설정하려면 Enter)'
-$TunnelName = Read-Host 'Cloudflare named tunnel 이름 (나중에 설정하려면 Enter)'
 $SecretBytes = New-Object byte[] 48
 $Random = [Security.Cryptography.RandomNumberGenerator]::Create()
 try {
@@ -48,7 +57,9 @@ try {
   $Random.Dispose()
 }
 $SessionSecret = [Convert]::ToBase64String($SecretBytes)
-$Origins = "http://localhost:5173,http://127.0.0.1:5173,$PublicWebUrl"
+$PublicWebUri = [Uri]$PublicWebUrl
+$PublicWebOrigin = "$($PublicWebUri.Scheme)://$($PublicWebUri.Authority)"
+$Origins = "http://localhost:5173,http://127.0.0.1:5173,$PublicWebOrigin"
 
 $Lines = @(
   'HOST=127.0.0.1'
@@ -72,11 +83,13 @@ $Lines = @(
   "TELEGRAM_BOT_TOKEN=$(Quote-Env $TelegramToken)"
   "TELEGRAM_OWNER_ID=$(Quote-Env $TelegramOwnerId)"
   "TELEGRAM_PARTNER_ID=$(Quote-Env $TelegramPartnerId)"
-  "INTERIOR_TUNNEL_NAME=$(Quote-Env $TunnelName)"
-  "VITE_API_BASE_URL=$(Quote-Env ($ApiOrigin.TrimEnd('/') + '/api'))"
+  'INTERIOR_TUNNEL_MODE=quick'
+  'INTERIOR_TUNNEL_NAME='
+  "GITHUB_REPOSITORY=$(Quote-Env $GitHubRepository)"
+  'VITE_API_BASE_URL=http://127.0.0.1:8787/api'
   'VITE_BASE_PATH=/'
 )
 
 [IO.File]::WriteAllLines($EnvPath, $Lines, [Text.UTF8Encoding]::new($false))
 Write-Output "초기 설정을 저장했습니다: $EnvPath"
-Write-Output '다음 명령: npm run build; npm run dev'
+Write-Output '다음 명령: npm run build; powershell -ExecutionPolicy Bypass -File scripts/install-startup.ps1'

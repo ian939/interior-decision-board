@@ -35,7 +35,8 @@
 | API 통합 | 로그인, 등록, 의견, 댓글, 상태 전환, 승인, 반영 요청, 내보내기, 파일 업로드 통과 |
 | 패키지 보안 검사 | 알려진 취약점 0개 |
 | 백업 복원성 점검 | SQLite 스냅샷 열기 및 카드 데이터 확인 통과 |
-| 외부 HTTPS/CORS | Cloudflare 임시 터널 왕복 통과 |
+| 외부 HTTPS/CORS | Cloudflare Quick Tunnel 외부 왕복 통과 |
+| 무료 터널 감시 | 임시 주소 감지, 원격 `/api/health`, 종료 후 프로세스 정리 통과 |
 
 ## 실제 자료 재검증
 
@@ -50,9 +51,8 @@
 ## 출시 연결에 필요한 정보
 
 - Telegram 봇 토큰과 두 사람의 numeric Telegram user ID
-- 운영용 고정 HTTPS 주소에 사용할 새 Cloudflare 도메인 선택·구매
 - 실제 표시 이름과 비밀번호의 로컬 입력
 
-공개 저장소 `ian939/interior-decision-board`와 GitHub Pages 사이트는 생성·활성화했다. 운영 API 주소가 확정되면 저장소 변수와 최종 프런트 빌드를 연결한다.
+공개 저장소 `ian939/interior-decision-board`와 GitHub Pages 사이트는 생성·활성화했다. 2주 단기 운영은 도메인 구매 없이 Quick Tunnel 주소를 자동 반영한다.
 
 비밀번호와 봇 토큰은 채팅이나 Git 저장소에 남기지 않고 `scripts/setup.ps1`로 로컬 `.env`에만 입력한다.

@@ -21,6 +21,7 @@ backups/
 *.log
 .tmp/
 tmp/
+.runtime/
 
 # Editor and operating system files
 .DS_Store
