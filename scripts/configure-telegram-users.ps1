@@ -37,7 +37,7 @@ try {
 } catch {
   throw 'Telegram 사용자 조회에 실패했습니다. 두 분 모두 /start를 보냈는지 확인하고 다시 실행하세요.'
 }
-if ($Candidates.Count -lt 2) { throw '두 분 모두 새 봇의 개인 채팅에서 /start를 보낸 뒤 다시 실행하세요.' }
+if ($Candidates.Count -lt 1) { throw '본인이 새 봇의 개인 채팅에서 /start를 보낸 뒤 다시 실행하세요.' }
 Write-Host '발견한 Telegram 사용자:' -ForegroundColor Cyan
 foreach ($Candidate in $Candidates) {
   $Name = (@($Candidate.first_name, $Candidate.last_name) | Where-Object { $_ }) -join ' '
@@ -46,11 +46,11 @@ foreach ($Candidate in $Candidates) {
 }
 
 if (-not $OwnerId) { $OwnerId = Read-Host '본인 Telegram numeric ID' }
-if (-not $PartnerId) { $PartnerId = Read-Host '배우자 Telegram numeric ID' }
-if ($OwnerId -notmatch '^\d+$' -or $PartnerId -notmatch '^\d+$') { throw 'Telegram ID는 숫자만 입력하세요.' }
-if ($OwnerId -eq $PartnerId) { throw '두 사용자 ID는 서로 달라야 합니다.' }
+if (-not $PartnerId) { $PartnerId = Read-Host '배우자 Telegram numeric ID (연결하지 않으려면 Enter)' }
+if ($OwnerId -notmatch '^\d+$' -or ($PartnerId -and $PartnerId -notmatch '^\d+$')) { throw 'Telegram ID는 숫자만 입력하세요.' }
+if ($PartnerId -and $OwnerId -eq $PartnerId) { throw '두 사용자 ID는 서로 달라야 합니다.' }
 $CandidateIds = @($Candidates | ForEach-Object { [string]$_.id })
-if ($OwnerId -notin $CandidateIds -or $PartnerId -notin $CandidateIds) { throw '발견된 사용자 목록의 ID를 입력하세요.' }
+if ($OwnerId -notin $CandidateIds -or ($PartnerId -and $PartnerId -notin $CandidateIds)) { throw '발견된 사용자 목록의 ID를 입력하세요.' }
 
 $Lines = Get-Content -LiteralPath $EnvPath -Encoding UTF8
 $FoundToken = $false
@@ -70,4 +70,4 @@ if (-not $FoundPartner) { $Updated += "TELEGRAM_PARTNER_ID=`"$PartnerId`"" }
 & (Join-Path $PSScriptRoot 'uninstall-startup.ps1')
 Start-Sleep -Seconds 2
 & (Join-Path $PSScriptRoot 'install-startup.ps1')
-Write-Output '새 Telegram 토큰과 두 사용자 연결을 저장하고 서비스를 재시작했습니다.'
+Write-Output '새 Telegram 토큰과 사용자 연결을 저장하고 서비스를 재시작했습니다.'
