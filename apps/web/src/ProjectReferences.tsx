@@ -71,11 +71,11 @@ const briefGroups = [
   { id: "electric", label: "조명·전기", slides: [17, 18], summary: ["공간별 주백색·전구색 조명 계획", "커튼박스·아일랜드·거울장·화장대 콘센트"] },
 ] as const;
 
-function ImagePreview({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }): ReactNode {
+function ImagePreview({ src, alt, mirrored = false, onClose }: { src: string; alt: string; mirrored?: boolean; onClose: () => void }): ReactNode {
   return (
     <div className="reference-lightbox" role="dialog" aria-modal="true" aria-label={`${alt} 크게 보기`} onClick={onClose}>
       <button className="reference-lightbox-close" onClick={onClose} aria-label="닫기"><X size={21} /></button>
-      <img src={src} alt={alt} onClick={(event) => event.stopPropagation()} />
+      <img className={mirrored ? "mirrored-plan-image" : undefined} src={src} alt={alt} onClick={(event) => event.stopPropagation()} />
     </div>
   );
 }
@@ -84,7 +84,8 @@ export function ProjectReferencesView(): ReactNode {
   const [tab, setTab] = useState<ReferenceTab>("plans");
   const [groupId, setGroupId] = useState("all");
   const [selectedSlide, setSelectedSlide] = useState(7);
-  const [preview, setPreview] = useState<{ src: string; alt: string } | null>(null);
+  const [mirroredPlan, setMirroredPlan] = useState(true);
+  const [preview, setPreview] = useState<{ src: string; alt: string; mirrored?: boolean } | null>(null);
 
   const visibleSlides = useMemo(() => {
     if (groupId === "all") return slideTitles.map((_, index) => index + 1);
@@ -132,9 +133,18 @@ export function ProjectReferencesView(): ReactNode {
 
       {tab === "plans" ? (
         <div className="reference-tab-panel">
-          <div className="reference-section-heading"><div><span>01 · FLOOR PLAN</span><h2>도면에서 먼저 확인할 것</h2></div><p>도면을 누르면 크게 볼 수 있습니다.</p></div>
+          <div className="reference-section-heading plan-section-heading">
+            <div><span>01 · FLOOR PLAN</span><h2>도면에서 먼저 확인할 것</h2></div>
+            <div className="plan-heading-actions">
+              <p>도면을 누르면 크게 볼 수 있습니다.</p>
+              <div className="plan-orientation-control" role="group" aria-label="도면 방향">
+                <button className={mirroredPlan ? "active" : ""} type="button" aria-pressed={mirroredPlan} onClick={() => setMirroredPlan(true)}>실제 방향 · 왼쪽 진입</button>
+                <button className={!mirroredPlan ? "active" : ""} type="button" aria-pressed={!mirroredPlan} onClick={() => setMirroredPlan(false)}>원본 방향</button>
+              </div>
+            </div>
+          </div>
           <div className="floorplan-grid">
-            {floorPlans.map((plan) => <figure className="floorplan-card" key={plan.label}><button onClick={() => setPreview({ src: plan.src, alt: plan.alt })}><img src={plan.src} alt={plan.alt} /><span><Maximize2 size={15} /> 크게 보기</span></button><figcaption><strong>{plan.label}</strong><p>{plan.caption}</p></figcaption></figure>)}
+            {floorPlans.map((plan) => <figure className="floorplan-card" key={plan.label}><button onClick={() => setPreview({ src: plan.src, alt: plan.alt, mirrored: mirroredPlan })}><img className={mirroredPlan ? "mirrored-plan-image" : undefined} src={plan.src} alt={plan.alt} /><span><Maximize2 size={15} /> 크게 보기</span></button><figcaption><div><strong>{plan.label}</strong><span className="plan-orientation-badge">{mirroredPlan ? "좌우 반전 · 현관 왼쪽 진입" : "원본 · 현관 오른쪽 진입"}</span></div><p>{plan.caption}</p></figcaption></figure>)}
           </div>
           <div className="plan-detail-grid">
             <section className="renovation-points"><div className="reference-card-title"><Ruler size={18} /><div><strong>공사 포인트 7</strong><span>표시 도면 번호와 연결됩니다.</span></div></div>{renovationPoints.map(([number, title, detail]) => <article key={number}><span>{number}</span><div><strong>{title}</strong><p>{detail}</p></div></article>)}</section>
@@ -169,7 +179,7 @@ export function ProjectReferencesView(): ReactNode {
         </div>
       ) : null}
 
-      {preview ? <ImagePreview src={preview.src} alt={preview.alt} onClose={() => setPreview(null)} /> : null}
+      {preview ? <ImagePreview src={preview.src} alt={preview.alt} mirrored={preview.mirrored} onClose={() => setPreview(null)} /> : null}
     </div>
   );
 }

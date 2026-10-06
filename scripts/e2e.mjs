@@ -29,7 +29,18 @@ try {
   }
   await page.getByRole("button", { name: /도면·아이디어/ }).click();
   await page.getByRole("heading", { name: "도면과 기존 아이디어" }).waitFor();
-  await page.getByAltText("공사 포인트가 표시된 평면도").waitFor();
+  const floorPlan = page.getByAltText("공사 포인트가 표시된 평면도");
+  await floorPlan.waitFor();
+  if (!(await floorPlan.evaluate((image) => image.classList.contains("mirrored-plan-image")))) throw new Error("도면이 실제 방향(좌우 반전)으로 열리지 않았습니다.");
+  await page.getByRole("button", { name: "원본 방향" }).click();
+  if (await floorPlan.evaluate((image) => image.classList.contains("mirrored-plan-image"))) throw new Error("원본 방향 전환이 적용되지 않았습니다.");
+  await page.getByRole("button", { name: /실제 방향/ }).click();
+  if (!(await floorPlan.evaluate((image) => image.classList.contains("mirrored-plan-image")))) throw new Error("실제 방향 복원이 적용되지 않았습니다.");
+  await floorPlan.locator("xpath=..").click();
+  const previewPlan = page.getByRole("dialog").getByAltText("공사 포인트가 표시된 평면도");
+  await previewPlan.waitFor();
+  if (!(await previewPlan.evaluate((image) => image.classList.contains("mirrored-plan-image")))) throw new Error("확대 보기에서 실제 방향이 유지되지 않았습니다.");
+  await page.getByRole("button", { name: "닫기" }).click();
   await page.screenshot({ path: resolve(outputDir, "05-references-plans-desktop.png"), fullPage: true });
   await page.getByRole("button", { name: /디자인·아이디어/ }).click();
   await page.getByRole("heading", { name: "인출식 + 폭포수 모드 주방 수전" }).waitFor();
@@ -57,7 +68,7 @@ try {
     JSON.stringify(
       {
         ok: true,
-        assertions: ["login", "desktop_board", "card_drawer", "mobile_board", "reference_plans", "reference_ideas", "reference_brief", "reference_mobile"],
+        assertions: ["login", "desktop_board", "card_drawer", "mobile_board", "reference_plans", "reference_plan_orientation", "reference_ideas", "reference_brief", "reference_mobile"],
         outputDir,
       },
       null,
