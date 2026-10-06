@@ -40,6 +40,29 @@ function Quote-Env([string]$Value) {
   return '"' + $Value.Replace('\', '\\').Replace('"', '\"') + '"'
 }
 
+function Show-TelegramCandidates([string]$Token) {
+  if (-not $Token) { return }
+  try {
+    $Response = Invoke-RestMethod -Method Get -Uri ("https://api.telegram.org/bot{0}/getUpdates" -f $Token) -TimeoutSec 15
+    $Candidates = @($Response.result |
+      ForEach-Object { if ($_.message -and $_.message.from) { $_.message.from } elseif ($_.my_chat_member -and $_.my_chat_member.from) { $_.my_chat_member.from } } |
+      Where-Object { $_ -and $_.id } |
+      Sort-Object id -Unique)
+    if ($Candidates.Count -eq 0) {
+      Write-Host '아직 Telegram 사용자를 찾지 못했습니다. 두 분 모두 봇 개인 채팅에서 /start를 보낸 뒤 ID를 입력하세요.' -ForegroundColor Yellow
+      return
+    }
+    Write-Host '발견한 Telegram 사용자:' -ForegroundColor Cyan
+    foreach ($Candidate in $Candidates) {
+      $Name = (@($Candidate.first_name, $Candidate.last_name) | Where-Object { $_ }) -join ' '
+      $Username = if ($Candidate.username) { "@$($Candidate.username)" } else { 'username 없음' }
+      Write-Host "  ID $($Candidate.id) · $Name · $Username"
+    }
+  } catch {
+    Write-Warning 'Telegram 사용자 자동 조회에 실패했습니다. 토큰과 /start 전송 여부를 확인한 뒤 ID를 직접 입력하세요.'
+  }
+}
+
 $OwnerName = Read-RequiredText '본인 표시 이름' '나'
 $OwnerPassword = Read-PlainPassword '본인 비밀번호 (8자 이상)'
 $PartnerName = Read-RequiredText '배우자 표시 이름' '배우자'
@@ -47,6 +70,7 @@ $PartnerPassword = Read-PlainPassword '배우자 비밀번호 (8자 이상)'
 $PublicWebUrl = Read-RequiredText 'GitHub Pages URL' 'https://ian939.github.io/interior-decision-board/'
 $GitHubRepository = Read-RequiredText 'GitHub 저장소' 'ian939/interior-decision-board'
 $TelegramToken = Read-OptionalSecret 'Telegram bot token (화면에 표시되지 않음, 나중에 설정하려면 Enter)'
+Show-TelegramCandidates $TelegramToken
 $TelegramOwnerId = Read-Host '본인 Telegram numeric user ID (나중에 설정하려면 Enter)'
 $TelegramPartnerId = Read-Host '배우자 Telegram numeric user ID (나중에 설정하려면 Enter)'
 $SecretBytes = New-Object byte[] 48
