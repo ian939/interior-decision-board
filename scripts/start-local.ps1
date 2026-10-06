@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$EnvFile = '.env',
   [switch]$Probe,
   [switch]$SkipPagesUpdate

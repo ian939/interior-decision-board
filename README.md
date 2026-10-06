@@ -73,10 +73,10 @@ E2E는 설치된 Chrome을 사용하며 `.tmp/e2e`에 로그인·칸반·카드 
 
 ## Telegram 연결
 
-1. Telegram의 `@BotFather`에서 봇을 만든다.
+1. Telegram의 `@BotFather`에서 봇 토큰을 새로 발급한다.
 2. 본인과 배우자가 봇 개인 채팅에서 `/start`를 보낸다.
-3. `scripts/setup.ps1`에 토큰을 숨김 입력하면 발견한 numeric Telegram user ID가 표시되므로 두 사람의 ID를 선택해 입력한다.
-4. 서버를 재시작하고 두 사람이 봇 개인 채팅에 `/start`를 보낸다.
+3. `powershell -ExecutionPolicy Bypass -File scripts/configure-telegram-users.ps1`을 실행한다.
+4. 새 토큰을 숨김 입력하고 화면에 표시된 두 사람의 numeric ID를 각각 선택한다. 서비스는 자동 재시작된다.
 
 허용된 두 Telegram ID의 메시지만 처리합니다. URL이 여러 개인 메시지는 URL별 카드로 만들며, 사진과 문서도 등록할 수 있습니다.
 

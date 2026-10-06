@@ -27,7 +27,9 @@ export class TelegramListener {
     bot.command("start", async (context) => {
       const user = this.store.getTelegramUser(String(context.from?.id ?? ""));
       if (!user) {
-        await context.reply("등록되지 않은 사용자입니다. 서버 설정의 Telegram 사용자 ID를 확인해 주세요.");
+        await context.reply(
+          `아직 등록되지 않은 사용자입니다.\n내 Telegram ID: ${context.from?.id ?? "확인 불가"}\n이 ID를 운영자에게 전달해 사용자 연결을 완료해 주세요.`,
+        );
         return;
       }
       await context.reply(`${user.name}님, 인테리어 링크나 파일을 보내주세요. 결정 필요 보드에 자동으로 올릴게요.`);
