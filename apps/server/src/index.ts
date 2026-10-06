@@ -22,7 +22,7 @@ await app.register(cors, {
     if (!origin || config.origins.includes(origin)) return callback(null, true);
     return callback(new Error("허용되지 않은 Origin입니다."), false);
   },
-  methods: ["GET", "POST", "PUT", "PATCH", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["authorization", "content-type"],
   maxAge: 600,
 });
