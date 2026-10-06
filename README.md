@@ -57,6 +57,12 @@ npm run dev
 
 `setup.ps1`은 두 비밀번호와 선택적인 Telegram/터널 정보를 한 번에 받고, Git에서 제외된 `.env`를 만듭니다. 비밀번호는 첫 실행 때만 사용자 생성에 쓰이며 SQLite에는 scrypt 해시만 저장됩니다.
 
+기존 사용자 생성 후 `.env`의 `OWNER_PASSWORD` 또는 `PARTNER_PASSWORD`를 바꿨다면 아래 명령으로 새 값을 SQLite 계정에 다시 해시해 반영한 뒤 서비스를 재시작합니다.
+
+```powershell
+npm run sync-passwords
+```
+
 ## 검증
 
 ```powershell

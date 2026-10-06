@@ -13,6 +13,7 @@
     "dev:web": "npm run dev -w @interior/web",
     "build": "npm run build -w @interior/shared && npm run build -w @interior/server && npm run build -w @interior/web",
     "backup": "node scripts/backup.mjs",
+    "sync-passwords": "node scripts/sync-passwords.mjs",
     "test": "vitest run",
     "test:e2e": "node scripts/e2e.mjs",
     "test:watch": "vitest",
