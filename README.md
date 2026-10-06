@@ -92,12 +92,10 @@ E2E는 설치된 Chrome을 사용하며 `.tmp/e2e`에 로그인·칸반·카드 
 
 2주 단기 사용은 무료 Cloudflare Quick Tunnel을 사용합니다. Cloudflare 계정이나 도메인이 필요하지 않습니다. 임시 주소가 바뀌면 감시 스크립트가 GitHub Pages의 API 주소를 자동 갱신하고 재배포합니다.
 
-최초 설정과 빌드 후 Windows 시작 작업을 등록합니다.
+최초 활성화는 아래 명령 한 번으로 설정 입력, 빌드, Windows 시작 작업 등록까지 진행합니다.
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/setup.ps1
-npm run build
-powershell -ExecutionPolicy Bypass -File scripts/install-startup.ps1
+powershell -ExecutionPolicy Bypass -File scripts/activate.ps1
 ```
 
 이 명령은 로그인 시 서버·터널을 감시하는 작업과 매일 오전 3시 백업 작업을 등록합니다. 서버가 종료되면 예약 작업이 다시 시작하고, 터널만 끊기면 새 Quick Tunnel을 만들고 Pages 주소를 갱신합니다.
