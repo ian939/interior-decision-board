@@ -20,7 +20,7 @@
 - Telegram 전용 봇 개인 채팅 장기 폴링
 - SQLite, 로컬 파일 저장, 순환 백업
 - GitHub Pages 자동 배포 워크플로
-- Windows 로그인 시 로컬 서버·터널 자동 실행 및 일일 백업 예약 스크립트
+- Windows 로그인 시 로컬 서버·터널 자동 실행 및 오전 3시 이후 일일 백업
 
 ## 구조
 
@@ -92,15 +92,15 @@ E2E는 설치된 Chrome을 사용하며 `.tmp/e2e`에 로그인·칸반·카드 
 
 2주 단기 사용은 무료 Cloudflare Quick Tunnel을 사용합니다. Cloudflare 계정이나 도메인이 필요하지 않습니다. 임시 주소가 바뀌면 감시 스크립트가 GitHub Pages의 API 주소를 자동 갱신하고 재배포합니다.
 
-최초 활성화는 아래 명령 한 번으로 설정 입력, 빌드, Windows 시작 작업 등록까지 진행합니다.
+최초 활성화는 아래 명령 한 번으로 설정 입력, 빌드, Windows 사용자 시작프로그램 등록까지 진행합니다. 관리자 권한은 필요하지 않습니다.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/activate.ps1
 ```
 
-이 명령은 로그인 시 서버·터널을 감시하는 작업과 매일 오전 3시 백업 작업을 등록합니다. 서버가 종료되면 예약 작업이 다시 시작하고, 터널만 끊기면 새 Quick Tunnel을 만들고 Pages 주소를 갱신합니다.
+이 명령은 로그인 시 서버·터널을 감시하는 숨김 프로세스를 사용자 시작프로그램에 등록합니다. 감시 프로세스가 오전 3시 이후 하루 한 번 백업하며, 서버가 종료되면 다시 시작하고 터널만 끊기면 새 Quick Tunnel을 만든 뒤 Pages 주소를 갱신합니다.
 
-사용을 마치면 예약 작업과 실행 프로세스만 제거할 수 있습니다. DB와 첨부파일은 보존됩니다.
+사용을 마치면 시작프로그램 바로가기와 실행 프로세스만 제거할 수 있습니다. DB와 첨부파일은 보존됩니다.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/uninstall-startup.ps1
@@ -112,7 +112,7 @@ powershell -ExecutionPolicy Bypass -File scripts/uninstall-startup.ps1
 npm run backup
 ```
 
-`backups/<timestamp>`에 SQLite 스냅샷과 업로드 파일을 복사하며, 기본값은 최근 14개 보존입니다. `scripts/install-startup.ps1`이 매일 오전 3시 실행도 함께 등록합니다.
+`backups/<timestamp>`에 SQLite 스냅샷과 업로드 파일을 복사하며, 기본값은 최근 14개 보존입니다. 자동 실행 중에는 오전 3시가 지난 뒤 그날의 첫 백업을 수행하므로 PC가 절전 상태였다가 깨어나도 누락하지 않습니다.
 
 ## 폴더
 

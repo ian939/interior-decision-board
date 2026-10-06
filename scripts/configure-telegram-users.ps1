@@ -55,9 +55,7 @@ if (-not $FoundOwner) { $Updated += "TELEGRAM_OWNER_ID=`"$OwnerId`"" }
 if (-not $FoundPartner) { $Updated += "TELEGRAM_PARTNER_ID=`"$PartnerId`"" }
 [IO.File]::WriteAllLines($EnvPath, $Updated, [Text.UTF8Encoding]::new($false))
 
-if (Get-ScheduledTask -TaskName 'InteriorDecisionBoard' -ErrorAction SilentlyContinue) {
-  Stop-ScheduledTask -TaskName 'InteriorDecisionBoard' -ErrorAction SilentlyContinue
-  Start-Sleep -Seconds 2
-  Start-ScheduledTask -TaskName 'InteriorDecisionBoard'
-}
+& (Join-Path $PSScriptRoot 'uninstall-startup.ps1')
+Start-Sleep -Seconds 2
+& (Join-Path $PSScriptRoot 'install-startup.ps1')
 Write-Output '새 Telegram 토큰과 두 사용자 연결을 저장하고 서비스를 재시작했습니다.'

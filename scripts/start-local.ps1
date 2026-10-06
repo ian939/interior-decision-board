@@ -36,6 +36,41 @@ function Write-SupervisorLog([string]$Message) {
   Add-Content -LiteralPath (Join-Path $RuntimeDir 'supervisor.log') -Value "[$Timestamp] $Message" -Encoding UTF8
 }
 
+$script:LastBackupAttempt = ''
+function Invoke-DailyBackup {
+  $Now = Get-Date
+  if ($Now.Hour -lt 3) { return }
+
+  $Today = $Now.ToString('yyyy-MM-dd')
+  $StatePath = Join-Path $RuntimeDir 'last-backup-date.txt'
+  $LastSuccess = if (Test-Path -LiteralPath $StatePath) {
+    (Get-Content -Raw -LiteralPath $StatePath -ErrorAction SilentlyContinue).Trim()
+  } else { '' }
+  if ($LastSuccess -eq $Today -or $script:LastBackupAttempt -eq $Today) { return }
+
+  $script:LastBackupAttempt = $Today
+  $BackupLog = Join-Path $RuntimeDir 'backup.log'
+  $BackupScript = Join-Path $PSScriptRoot 'backup.mjs'
+  try {
+    $PreviousErrorAction = $ErrorActionPreference
+    try {
+      $ErrorActionPreference = 'Continue'
+      $Output = & (Get-Command 'node.exe' -ErrorAction Stop).Source $BackupScript 2>&1
+      $BackupExitCode = $LASTEXITCODE
+    } finally {
+      $ErrorActionPreference = $PreviousErrorAction
+    }
+    if ($Output) { $Output | ForEach-Object { [string]$_ } | Add-Content -LiteralPath $BackupLog -Encoding UTF8 }
+    if ($BackupExitCode -ne 0) { throw "백업 프로세스 종료 코드: $BackupExitCode" }
+    Set-Content -LiteralPath $StatePath -Value $Today -Encoding ASCII
+    Write-SupervisorLog "일일 백업 완료: $Today"
+  } catch {
+    $SafeMessage = $_.Exception.Message -replace '[\r\n]+', ' '
+    Add-Content -LiteralPath $BackupLog -Value "[$($Now.ToString('yyyy-MM-dd HH:mm:ss'))] 실패: $SafeMessage" -Encoding UTF8
+    Write-SupervisorLog "일일 백업 실패: $SafeMessage"
+  }
+}
+
 function Start-InteriorServer {
   $Stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
   $Node = (Get-Command 'node.exe' -ErrorAction Stop).Source
@@ -129,6 +164,7 @@ try {
   $Server = Start-InteriorServer
   Wait-ForApi $Server $Port
   Write-SupervisorLog "로컬 API 시작: PID $($Server.Id)"
+  Invoke-DailyBackup
 
   if ($TunnelMode -eq 'named') {
     if (-not $TunnelName) { throw 'named 모드에는 INTERIOR_TUNNEL_NAME이 필요합니다.' }
@@ -166,7 +202,10 @@ try {
         break
       }
 
-      while (-not $Server.HasExited -and -not $Tunnel.HasExited) { Start-Sleep -Seconds 5 }
+      while (-not $Server.HasExited -and -not $Tunnel.HasExited) {
+        Invoke-DailyBackup
+        Start-Sleep -Seconds 5
+      }
       if (-not $Server.HasExited) {
         Write-SupervisorLog 'Quick Tunnel이 종료되어 5초 후 새 주소로 다시 연결합니다.'
         Start-Sleep -Seconds 5

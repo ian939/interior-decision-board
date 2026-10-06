@@ -1,37 +1,47 @@
 ﻿param(
-  [string]$TaskName = 'InteriorDecisionBoard',
-  [string]$BackupTaskName = 'InteriorDecisionBoardBackup',
-  [datetime]$BackupAt = '03:00'
+  [string]$ShortcutName = 'InteriorDecisionBoard.lnk'
 )
 
 $ErrorActionPreference = 'Stop'
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
-$Launcher = Join-Path $PSScriptRoot 'start-local.ps1'
+$Supervisor = Join-Path $PSScriptRoot 'supervise-local.ps1'
+$EnvPath = Join-Path $ProjectRoot '.env'
+$ServerEntry = Join-Path $ProjectRoot 'apps\server\dist\index.js'
+$RuntimeDir = Join-Path $ProjectRoot '.runtime'
+$SupervisorPidPath = Join-Path $RuntimeDir 'supervisor.pid'
+$StartupDir = [Environment]::GetFolderPath('Startup')
+$ShortcutPath = Join-Path $StartupDir $ShortcutName
 
-if (-not (Test-Path -LiteralPath $Launcher)) {
-  throw "시작 스크립트를 찾을 수 없습니다: $Launcher"
-}
-if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot '.env'))) {
-  throw '.env 파일이 없습니다. 먼저 scripts/setup.ps1을 실행하세요.'
-}
-if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot 'apps\server\dist\index.js'))) {
-  throw '서버 빌드가 없습니다. 먼저 npm run build를 실행하세요.'
+foreach ($RequiredPath in @($Supervisor, $EnvPath, $ServerEntry)) {
+  if (-not (Test-Path -LiteralPath $RequiredPath)) {
+    throw "필수 파일을 찾을 수 없습니다: $RequiredPath"
+  }
 }
 
-$Action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$Launcher`"" -WorkingDirectory $ProjectRoot
-$Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -RestartCount 10 -RestartInterval (New-TimeSpan -Minutes 1) -MultipleInstances IgnoreNew -ExecutionTimeLimit ([TimeSpan]::Zero)
-Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -Description '인테리어 공동 의사결정 로컬 서버 및 무료 Quick Tunnel 자동 유지' -Force
+New-Item -ItemType Directory -Path $RuntimeDir -Force | Out-Null
 
-$Node = (Get-Command 'node.exe' -ErrorAction Stop).Source
-$BackupScript = Join-Path $PSScriptRoot 'backup.mjs'
-if (-not (Test-Path -LiteralPath $BackupScript)) {
-  throw "백업 스크립트를 찾을 수 없습니다: $BackupScript"
+$Shell = New-Object -ComObject WScript.Shell
+$Shortcut = $Shell.CreateShortcut($ShortcutPath)
+$Shortcut.TargetPath = (Get-Command 'powershell.exe' -ErrorAction Stop).Source
+$Shortcut.Arguments = "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$Supervisor`""
+$Shortcut.WorkingDirectory = $ProjectRoot
+$Shortcut.Description = '인테리어 공동 의사결정 서버 및 무료 Quick Tunnel 자동 시작'
+$Shortcut.Save()
+
+$AlreadyRunning = $false
+if (Test-Path -LiteralPath $SupervisorPidPath) {
+  $ExistingPid = 0
+  if ([int]::TryParse((Get-Content -Raw -LiteralPath $SupervisorPidPath).Trim(), [ref]$ExistingPid)) {
+    $AlreadyRunning = [bool](Get-Process -Id $ExistingPid -ErrorAction SilentlyContinue)
+  }
 }
-$BackupAction = New-ScheduledTaskAction -Execute $Node -Argument "`"$BackupScript`"" -WorkingDirectory $ProjectRoot
-$BackupTrigger = New-ScheduledTaskTrigger -Daily -At $BackupAt
-$BackupSettings = New-ScheduledTaskSettingsSet -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Hours 2)
-Register-ScheduledTask -TaskName $BackupTaskName -Action $BackupAction -Trigger $BackupTrigger -Settings $BackupSettings -Description '인테리어 공동 의사결정 데이터 및 첨부파일 일일 백업' -Force
 
-Start-ScheduledTask -TaskName $TaskName
-Write-Output "예약 작업 '$TaskName'과 일일 백업 '$BackupTaskName'을 등록했습니다."
+if (-not $AlreadyRunning) {
+  Start-Process -FilePath 'powershell.exe' `
+    -ArgumentList @('-NoProfile', '-WindowStyle', 'Hidden', '-ExecutionPolicy', 'Bypass', '-File', "`"$Supervisor`"") `
+    -WorkingDirectory $ProjectRoot `
+    -WindowStyle Hidden
+}
+
+Write-Output "사용자 시작프로그램에 자동 실행을 등록했습니다: $ShortcutPath"
+Write-Output '서버 감시와 오전 3시 이후 일일 백업을 시작했습니다.'
