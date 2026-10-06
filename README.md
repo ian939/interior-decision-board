@@ -17,6 +17,7 @@
 - 보완 URL·파일 첨부와 Claude 비교 초안
 - 한 사람 승인 및 승인 이력
 - 공간별 작업 요청, 완료 표시, Markdown/CSV 내보내기
+- 도면 2종, 공사 포인트, 디자인 콘셉트와 기존 상세 아이디어 18장을 모은 프로젝트 자료실
 - Telegram 전용 봇 개인 채팅 장기 폴링
 - SQLite, 로컬 파일 저장, 순환 백업
 - GitHub Pages 자동 배포 워크플로
@@ -84,7 +85,7 @@ E2E는 설치된 Chrome을 사용하며 `.tmp/e2e`에 로그인·칸반·카드 
 3. `powershell -ExecutionPolicy Bypass -File scripts/configure-telegram-users.ps1`을 실행한다.
 4. 새 토큰을 숨김 입력하고 화면에 표시된 본인의 numeric ID를 선택한다. 배우자가 Telegram을 사용하지 않으면 배우자 ID 입력은 Enter로 건너뛴다. 서비스는 자동 재시작된다.
 
-허용된 두 Telegram ID의 메시지만 처리합니다. URL이 여러 개인 메시지는 URL별 카드로 만들며, 사진과 문서도 등록할 수 있습니다.
+허용된 Telegram ID의 메시지만 처리합니다. URL이 여러 개인 메시지는 URL별 카드로 만들며, 사진과 문서도 등록할 수 있습니다.
 
 ## GitHub Pages 배포
 

@@ -27,6 +27,16 @@ try {
     await page.screenshot({ path: resolve(outputDir, "03-card-drawer.png"), fullPage: true });
     await page.getByRole("button", { name: "닫기" }).last().click();
   }
+  await page.getByRole("button", { name: /도면·아이디어/ }).click();
+  await page.getByRole("heading", { name: "도면과 기존 아이디어" }).waitFor();
+  await page.getByAltText("공사 포인트가 표시된 평면도").waitFor();
+  await page.screenshot({ path: resolve(outputDir, "05-references-plans-desktop.png"), fullPage: true });
+  await page.getByRole("button", { name: /디자인·아이디어/ }).click();
+  await page.getByRole("heading", { name: "인출식 + 폭포수 모드 주방 수전" }).waitFor();
+  await page.screenshot({ path: resolve(outputDir, "06-references-ideas-desktop.png"), fullPage: true });
+  await page.getByRole("button", { name: /슬라이드 7 보기/ }).click();
+  await page.getByRole("heading", { name: "주방 수전 · 아일랜드 설비" }).waitFor();
+  await page.screenshot({ path: resolve(outputDir, "07-references-brief-desktop.png"), fullPage: true });
   const token = await page.evaluate(() => localStorage.getItem("interior-decision-token"));
   await desktop.close();
 
@@ -36,13 +46,18 @@ try {
   await mobilePage.goto("http://127.0.0.1:5173", { waitUntil: "domcontentloaded" });
   await mobilePage.getByText("오늘은 무엇을 결정할까요?").waitFor();
   await mobilePage.screenshot({ path: resolve(outputDir, "04-board-mobile.png"), fullPage: true });
+  await mobilePage.getByRole("button", { name: "메뉴 열기" }).click();
+  await mobilePage.getByRole("button", { name: /도면·아이디어/ }).click();
+  await mobilePage.getByRole("heading", { name: "도면과 기존 아이디어" }).waitFor();
+  await mobilePage.waitForTimeout(300);
+  await mobilePage.screenshot({ path: resolve(outputDir, "08-references-mobile.png"), fullPage: true });
   await mobile.close();
 
   console.log(
     JSON.stringify(
       {
         ok: true,
-        assertions: ["login", "desktop_board", "card_drawer", "mobile_board"],
+        assertions: ["login", "desktop_board", "card_drawer", "mobile_board", "reference_plans", "reference_ideas", "reference_brief", "reference_mobile"],
         outputDir,
       },
       null,
