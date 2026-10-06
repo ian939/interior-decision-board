@@ -1,5 +1,8 @@
+import { spawn } from "node:child_process";
 import { lookup } from "node:dns/promises";
+import { existsSync, readdirSync } from "node:fs";
 import { isIP } from "node:net";
+import { join } from "node:path";
 import type { SourceType } from "@interior/shared";
 
 const MAX_HTML_BYTES = 2 * 1024 * 1024;
@@ -15,6 +18,17 @@ export interface SourceMetadata {
   thumbnailUrl: string | null;
   excerpt: string | null;
   metadataQuality: "full" | "partial" | "unavailable";
+}
+
+export interface SourceExtractorOptions {
+  ytDlpCommand?: string;
+  ytDlpTimeoutMs?: number;
+}
+
+interface ExtractorMetadata {
+  title: string | null;
+  description: string | null;
+  thumbnailUrl: string | null;
 }
 
 function isPrivateIpv4(address: string): boolean {
@@ -81,6 +95,92 @@ export function detectSourceType(url: URL): SourceType {
     return "shopping";
   }
   return "web";
+}
+
+export function normalizeSourceUrl(rawUrl: string): string {
+  const url = new URL(rawUrl);
+  const host = url.hostname.toLowerCase();
+  if (host === "blog.naver.com" || host === "m.blog.naver.com") {
+    const match = url.pathname.match(/^\/([^/]+)\/(\d+)\/?$/);
+    if (match) {
+      const normalized = new URL("https://blog.naver.com/PostView.naver");
+      normalized.searchParams.set("blogId", match[1]!);
+      normalized.searchParams.set("logNo", match[2]!);
+      return normalized.href;
+    }
+  }
+  return url.href;
+}
+
+function resolveYtDlpCommand(configured = "yt-dlp"): string {
+  if (configured !== "yt-dlp" || process.platform !== "win32") return configured;
+  const localAppData = process.env.LOCALAPPDATA;
+  if (!localAppData) return configured;
+  const link = join(localAppData, "Microsoft", "WinGet", "Links", "yt-dlp.exe");
+  if (existsSync(link)) return link;
+  const packages = join(localAppData, "Microsoft", "WinGet", "Packages");
+  try {
+    const packageDirectory = readdirSync(packages).find((name) => name.startsWith("yt-dlp.yt-dlp_"));
+    if (packageDirectory) {
+      const executable = join(packages, packageDirectory, "yt-dlp.exe");
+      if (existsSync(executable)) return executable;
+    }
+  } catch {
+    // PATH lookup below remains the portable fallback.
+  }
+  return configured;
+}
+
+function fetchExtractorMetadata(rawUrl: string, options: SourceExtractorOptions): Promise<ExtractorMetadata | null> {
+  const command = resolveYtDlpCommand(options.ytDlpCommand);
+  const args = [
+    "--dump-single-json",
+    "--skip-download",
+    "--no-warnings",
+    "--no-playlist",
+    "--encoding",
+    "utf-8",
+    rawUrl,
+  ];
+  return new Promise((resolve) => {
+    const child = spawn(command, args, { shell: false, windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
+    let stdout = "";
+    let settled = false;
+    const finish = (value: ExtractorMetadata | null) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolve(value);
+    };
+    const timer = setTimeout(() => {
+      child.kill();
+      finish(null);
+    }, options.ytDlpTimeoutMs ?? 45_000);
+    child.stdout.setEncoding("utf8");
+    child.stderr.resume();
+    child.stdout.on("data", (chunk: string) => {
+      if (stdout.length <= 10 * 1024 * 1024) stdout += chunk;
+      if (stdout.length > 10 * 1024 * 1024) {
+        child.kill();
+        finish(null);
+      }
+    });
+    child.on("error", () => finish(null));
+    child.on("close", (code) => {
+      if (code !== 0) return finish(null);
+      try {
+        const result = JSON.parse(stdout) as Record<string, unknown>;
+        finish({
+          title: typeof result.title === "string" && result.title.trim() ? result.title.trim() : null,
+          description:
+            typeof result.description === "string" && result.description.trim() ? result.description.trim() : null,
+          thumbnailUrl: typeof result.thumbnail === "string" && result.thumbnail.trim() ? result.thumbnail : null,
+        });
+      } catch {
+        finish(null);
+      }
+    });
+  });
 }
 
 async function fetchPublic(rawUrl: string, accept: string): Promise<{ response: Response; finalUrl: string }> {
@@ -172,8 +272,10 @@ function textExcerpt(html: string): string | null {
   return cleaned ? cleaned.slice(0, 12_000) : null;
 }
 
-export async function fetchSourceMetadata(rawUrl: string): Promise<SourceMetadata> {
-  const { response, finalUrl } = await fetchPublic(rawUrl, "text/html,application/xhtml+xml");
+export async function fetchSourceMetadata(rawUrl: string, options: SourceExtractorOptions = {}): Promise<SourceMetadata> {
+  const normalizedUrl = normalizeSourceUrl(rawUrl);
+  const requestedType = detectSourceType(new URL(normalizedUrl));
+  const { response, finalUrl } = await fetchPublic(normalizedUrl, "text/html,application/xhtml+xml");
   if (!response.ok) throw new Error(`원문 요청 실패 (${response.status})`);
   const contentType = response.headers.get("content-type") ?? "";
   if (!contentType.includes("html")) throw new Error("HTML 문서가 아닙니다.");
@@ -189,18 +291,23 @@ export async function fetchSourceMetadata(rawUrl: string): Promise<SourceMetadat
   const final = new URL(finalUrl);
   const videoId = final.hostname === "youtu.be" ? final.pathname.split("/").filter(Boolean)[0] : final.searchParams.get("v");
   const youtubeThumbnail = videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : null;
-  const title = decodeEntities(meta["og:title"] ?? meta["twitter:title"] ?? titleTag ?? final.hostname) || final.hostname;
-  const description = decodeEntities(meta["og:description"] ?? meta["twitter:description"] ?? meta.description ?? "") || null;
-  const thumbnailUrl = meta["og:image"] ?? meta["twitter:image"] ?? youtubeThumbnail;
+  const extractor = requestedType === "reels" ? await fetchExtractorMetadata(normalizedUrl, options) : null;
+  const title =
+    extractor?.title ??
+    (decodeEntities(meta["og:title"] ?? meta["twitter:title"] ?? titleTag ?? final.hostname) || final.hostname);
+  const description =
+    extractor?.description ??
+    (decodeEntities(meta["og:description"] ?? meta["twitter:description"] ?? meta.description ?? "") || null);
+  const thumbnailUrl = extractor?.thumbnailUrl ?? meta["og:image"] ?? meta["twitter:image"] ?? youtubeThumbnail;
   const usefulTitle = title.toLowerCase() !== "instagram";
   const count = [usefulTitle ? title : null, description, thumbnailUrl].filter(Boolean).length;
   return {
-    finalUrl,
-    sourceType: detectSourceType(final),
+    finalUrl: requestedType === "reels" && final.pathname.startsWith("/accounts/login") ? normalizedUrl : finalUrl,
+    sourceType: requestedType,
     title,
     description,
     thumbnailUrl,
-    excerpt: textExcerpt(html),
+    excerpt: extractor?.description ?? textExcerpt(html),
     metadataQuality: count === 3 ? "full" : count > 0 ? "partial" : "unavailable",
   };
 }

@@ -86,7 +86,10 @@ export class JobWorker {
   private async analyzeCard(cardId: string): Promise<void> {
     const row = this.store.getCardRow(cardId);
     if (!row?.source_url) throw new Error("분석할 URL이 없습니다.");
-    const metadata = await fetchSourceMetadata(String(row.source_url));
+    const metadata = await fetchSourceMetadata(String(row.source_url), {
+      ytDlpCommand: this.appConfig.ytDlpCommand,
+      ytDlpTimeoutMs: this.appConfig.ytDlpTimeoutMs,
+    });
     const analysis = await this.claude.analyze(metadata);
     this.store.updateCardAnalysis(cardId, {
       title: analysis.title || metadata.title,
@@ -102,7 +105,10 @@ export class JobWorker {
   private async analyzeRelated(relatedSourceId: string): Promise<void> {
     const row = this.store.getRelatedSourceRow(relatedSourceId);
     if (!row?.url) throw new Error("분석할 보완 URL이 없습니다.");
-    const metadata = await fetchSourceMetadata(String(row.url));
+    const metadata = await fetchSourceMetadata(String(row.url), {
+      ytDlpCommand: this.appConfig.ytDlpCommand,
+      ytDlpTimeoutMs: this.appConfig.ytDlpTimeoutMs,
+    });
     const analysis = await this.claude.analyze(metadata);
     this.store.updateRelatedAnalysis(relatedSourceId, {
       title: analysis.title || metadata.title,

@@ -28,7 +28,7 @@
 
 | 검증 | 결과 |
 | --- | --- |
-| 자동 테스트 | 3개 파일, 8개 테스트 통과 |
+| 자동 테스트 | 3개 파일, 9개 테스트 통과 |
 | TypeScript 타입 검사 | shared/server/web 전체 통과 |
 | 프로덕션 빌드 | server/web 전체 통과 |
 | 브라우저 E2E | 로그인, 데스크톱 칸반, 카드 상세, 390px 모바일 통과 |
@@ -37,11 +37,22 @@
 | 백업 복원성 점검 | SQLite 스냅샷 열기 및 카드 데이터 확인 통과 |
 | 외부 HTTPS/CORS | Cloudflare 임시 터널 왕복 통과 |
 
+## 실제 자료 재검증
+
+사용자가 제공한 공개 자료 4개를 2026-10-06에 재검증했다.
+
+| 자료 | 결과 |
+| --- | --- |
+| Instagram Reels 2개 | `yt-dlp` 보조 추출로 제목·설명·썸네일 모두 확보 |
+| YouTube Shorts 1개 | 제목·설명·썸네일 확보, 자막 트랙은 없음 |
+| 네이버 블로그 1개 | PostView 주소 자동 정규화 후 제목·설명·썸네일 확보 |
+
 ## 출시 연결에 필요한 정보
 
 - Telegram 봇 토큰과 두 사람의 numeric Telegram user ID
-- 운영용 고정 HTTPS 주소에 사용할 Cloudflare 도메인·서브도메인 또는 대체 터널 선택
-- 공개 GitHub 저장소 이름과 생성·Pages 활성화 승인
+- 운영용 고정 HTTPS 주소에 사용할 새 Cloudflare 도메인 선택·구매
 - 실제 표시 이름과 비밀번호의 로컬 입력
+
+공개 저장소 `ian939/interior-decision-board`와 GitHub Pages 사이트는 생성·활성화했다. 운영 API 주소가 확정되면 저장소 변수와 최종 프런트 빌드를 연결한다.
 
 비밀번호와 봇 토큰은 채팅이나 Git 저장소에 남기지 않고 `scripts/setup.ps1`로 로컬 `.env`에만 입력한다.

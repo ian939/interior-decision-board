@@ -54,6 +54,8 @@ export const config = {
   partnerPassword: process.env.PARTNER_PASSWORD,
   claudeCommand: process.env.CLAUDE_COMMAND?.trim() || "claude",
   claudeTimeoutMs: integer(process.env.CLAUDE_TIMEOUT_MS, 60_000),
+  ytDlpCommand: process.env.YT_DLP_COMMAND?.trim() || "yt-dlp",
+  ytDlpTimeoutMs: integer(process.env.YT_DLP_TIMEOUT_MS, 45_000),
   telegramToken: process.env.TELEGRAM_BOT_TOKEN?.trim(),
   telegramOwnerId: process.env.TELEGRAM_OWNER_ID?.trim(),
   telegramPartnerId: process.env.TELEGRAM_PARTNER_ID?.trim(),

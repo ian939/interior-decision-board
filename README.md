@@ -2,6 +2,9 @@
 
 텔레그램과 웹으로 인테리어 자료를 모으고, 부부가 함께 검토해 실제 작업 요청으로 만드는 모바일 우선 칸반 서비스입니다.
 
+- 저장소: <https://github.com/ian939/interior-decision-board>
+- 웹: <https://ian939.github.io/interior-decision-board/> — 운영 API 도메인 연결 전에는 데이터 기능이 오프라인입니다.
+
 ## 현재 구현 범위
 
 - 두 사용자 로그인과 비밀번호 해시 저장
@@ -9,7 +12,7 @@
 - 확인 중 이동 시 공간 필수 지정
 - URL·파일 직접 등록
 - YouTube, Reels, 블로그, 쇼핑몰, 일반 웹 자동 분류
-- 메타데이터·썸네일 수집과 로컬 Claude CLI 요약
+- 메타데이터·썸네일 수집, 공개 Reels의 `yt-dlp` 보조 추출, 로컬 Claude CLI 요약
 - 댓글과 사용자별 좋아요/별로예요/보류
 - 보완 URL·파일 첨부와 Claude 비교 초안
 - 한 사람 승인 및 승인 이력
@@ -37,6 +40,7 @@ AI 모델 API나 SDK는 사용하지 않습니다. 서버는 로컬에 로그인
 - Node.js 24 이상
 - npm
 - 로그인된 Claude CLI
+- `yt-dlp`와 FFmpeg
 - Git과 GitHub CLI
 - 운영 외부 접속 시 `cloudflared`
 
@@ -117,7 +121,8 @@ npm run backup
 
 ## 알려진 제한
 
-- Reels는 Instagram 공개 HTML에서 유효한 설명·썸네일을 주지 않을 수 있습니다. 이 경우 원문 링크와 사용자 메모, 직접 첨부한 이미지로 검토합니다.
+- 공개 Reels는 `yt-dlp`로 제목·설명·썸네일을 보조 추출합니다. 비공개·로그인 제한·플랫폼 변경으로 추출이 실패하면 원문 링크와 사용자 메모, 직접 첨부한 이미지로 검토합니다.
+- 제공된 YouTube Shorts에는 자막 트랙이 없어서 제목·공개 메타데이터를 사용합니다. 자막이 있는 영상은 후속 확장으로 본문 품질을 높일 수 있습니다.
 - 집 PC나 터널이 꺼지면 GitHub Pages 화면은 열리지만 카드 데이터 기능은 오프라인입니다.
 - Node 24의 내장 SQLite는 현재 실행 시 experimental 경고를 출력할 수 있습니다. 테스트와 실제 통합 흐름은 정상 통과했습니다.
 - Telegram 토큰, 운영 도메인과 GitHub Pages 주소는 사용자 소유 정보라 저장소에 포함하지 않습니다.
