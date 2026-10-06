@@ -78,6 +78,7 @@ export const api = {
   },
   updateCard: (id: string, input: { title?: string; summary?: string | null; topicTags?: string[]; spaceIds?: string[] }) =>
     request<CardDetail>(`/cards/${id}`, { method: "PATCH", body: JSON.stringify(input) }),
+  deleteCard: (id: string) => request<{ ok: true }>(`/cards/${id}`, { method: "DELETE" }),
   transition: (id: string, input: TransitionInput) =>
     request<CardDetail>(`/cards/${id}/transition`, { method: "POST", body: JSON.stringify(input) }),
   comment: (id: string, body: string) =>

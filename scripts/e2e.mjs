@@ -25,6 +25,11 @@ try {
     await page.locator(".card-drawer").waitFor();
     await page.waitForTimeout(250);
     await page.screenshot({ path: resolve(outputDir, "03-card-drawer.png"), fullPage: true });
+    await page.getByRole("button", { name: "자료 삭제" }).click();
+    const deleteDialog = page.getByRole("dialog", { name: "이 자료를 삭제할까요?" });
+    await deleteDialog.waitFor();
+    await page.screenshot({ path: resolve(outputDir, "03b-card-delete-confirmation.png"), fullPage: true });
+    await deleteDialog.getByRole("button", { name: "취소" }).click();
     await page.getByRole("button", { name: "닫기" }).last().click();
   }
   await page.getByRole("button", { name: /도면·아이디어/ }).click();
@@ -68,7 +73,7 @@ try {
     JSON.stringify(
       {
         ok: true,
-        assertions: ["login", "desktop_board", "card_drawer", "mobile_board", "reference_plans", "reference_plan_orientation", "reference_ideas", "reference_brief", "reference_mobile"],
+        assertions: ["login", "desktop_board", "card_drawer", "card_delete_confirmation", "mobile_board", "reference_plans", "reference_plan_orientation", "reference_ideas", "reference_brief", "reference_mobile"],
         outputDir,
       },
       null,

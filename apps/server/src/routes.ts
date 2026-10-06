@@ -7,7 +7,7 @@ import type { AppConfig } from "./config.js";
 import { createSessionToken, verifyPassword } from "./auth.js";
 import { getAuthenticatedUser, requireUser } from "./session.js";
 import { detectSourceType } from "./source.js";
-import { saveMultipartFile } from "./files.js";
+import { removeStoredFiles, saveMultipartFile } from "./files.js";
 import { sourceTypeForUpload, type JobWorker } from "./worker.js";
 import type { ClaudeClient } from "./claude.js";
 import type { Store } from "./store.js";
@@ -159,6 +159,22 @@ export function registerRoutes(
     try {
       const card = store.updateCard(request.params.id, user.id, parsed.data);
       return card ?? reply.code(404).send({ error: "카드를 찾을 수 없습니다." });
+    } catch (error) {
+      return errorReply(reply, error);
+    }
+  });
+
+  app.delete<{ Params: { id: string } }>("/api/cards/:id", async (request, reply) => {
+    if (!requireUser(request, reply, store, appConfig)) return;
+    try {
+      const result = store.deleteCard(request.params.id);
+      if (!result.deleted) return reply.code(404).send({ error: "카드를 찾을 수 없습니다." });
+      try {
+        await removeStoredFiles(result.storedNames, appConfig);
+      } catch (error) {
+        console.error("삭제된 카드의 첨부 파일 정리에 실패했습니다.", error);
+      }
+      return { ok: true };
     } catch (error) {
       return errorReply(reply, error);
     }

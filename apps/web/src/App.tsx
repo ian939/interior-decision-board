@@ -54,6 +54,7 @@ import {
   Sparkles,
   ThumbsDown,
   ThumbsUp,
+  Trash2,
   Upload,
   X,
 } from "lucide-react";
@@ -483,28 +484,50 @@ function CardDrawer({ cardId, currentUser, users, spaces, onClose }: { cardId: s
   const queryClient = useQueryClient();
   const cardQuery = useQuery({ queryKey: ["card", cardId], queryFn: () => api.card(cardId), refetchInterval: 5_000 });
   const [error, setError] = useState<string | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const invalidate = async () => {
     await Promise.all([queryClient.invalidateQueries({ queryKey: ["card", cardId] }), queryClient.invalidateQueries({ queryKey: ["dashboard"] }), queryClient.invalidateQueries({ queryKey: ["work-requests"] })]);
   };
+  const remove = useMutation({
+    mutationFn: () => api.deleteCard(cardId),
+    onSuccess: async () => {
+      setDeleteOpen(false);
+      onClose();
+      queryClient.removeQueries({ queryKey: ["card", cardId] });
+      await Promise.all([queryClient.invalidateQueries({ queryKey: ["dashboard"] }), queryClient.invalidateQueries({ queryKey: ["work-requests"] })]);
+    },
+    onError: (mutationError) => {
+      setDeleteOpen(false);
+      setError(readableError(mutationError));
+    },
+  });
   if (cardQuery.isLoading) return <div className="drawer-backdrop"><aside className="card-drawer"><LoadingScreen /></aside></div>;
   if (!cardQuery.data) return <div className="drawer-backdrop"><aside className="card-drawer"><EmptyState icon={<CircleAlert />} title="카드를 열 수 없어요" description={readableError(cardQuery.error)} action={<button className="secondary-button" onClick={onClose}>닫기</button>} /></aside></div>;
   const card = cardQuery.data;
   return (
-    <div className="drawer-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
-      <aside className="card-drawer" aria-label="카드 상세">
-        <header className="drawer-header"><div className={`status-pill status-${card.status}`}><span />{statusLabel(card.status)}</div><button className="icon-button" onClick={onClose} aria-label="닫기"><X size={21} /></button></header>
-        <div className="drawer-scroll">
-          <CardHero card={card} />
-          {error ? <div className="notice error-notice"><CircleAlert size={18} /><span>{error}</span><button className="icon-button" onClick={() => setError(null)}><X size={15} /></button></div> : null}
-          <PreferencePanel card={card} users={users} currentUser={currentUser} onChange={async (value) => { try { await api.preference(card.id, value); await invalidate(); } catch (mutationError) { setError(readableError(mutationError)); } }} />
-          <CardInformation card={card} spaces={spaces} onSaved={invalidate} onError={setError} />
-          <TransitionPanel card={card} spaces={spaces} onChanged={invalidate} onError={setError} />
-          <RelatedPanel card={card} onChanged={invalidate} onError={setError} />
-          <CommentsPanel card={card} onChanged={invalidate} onError={setError} />
-          <ActivityPanel card={card} />
-        </div>
-      </aside>
-    </div>
+    <>
+      <div className="drawer-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+        <aside className="card-drawer" aria-label="카드 상세">
+          <header className="drawer-header"><div className={`status-pill status-${card.status}`}><span />{statusLabel(card.status)}</div><div className="drawer-header-actions"><button className="icon-button danger-icon" onClick={() => setDeleteOpen(true)} aria-label="자료 삭제" title="자료 삭제"><Trash2 size={18} /></button><button className="icon-button" onClick={onClose} aria-label="닫기"><X size={21} /></button></div></header>
+          <div className="drawer-scroll">
+            <CardHero card={card} />
+            {error ? <div className="notice error-notice"><CircleAlert size={18} /><span>{error}</span><button className="icon-button" onClick={() => setError(null)}><X size={15} /></button></div> : null}
+            <PreferencePanel card={card} users={users} currentUser={currentUser} onChange={async (value) => { try { await api.preference(card.id, value); await invalidate(); } catch (mutationError) { setError(readableError(mutationError)); } }} />
+            <CardInformation card={card} spaces={spaces} onSaved={invalidate} onError={setError} />
+            <TransitionPanel card={card} spaces={spaces} onChanged={invalidate} onError={setError} />
+            <RelatedPanel card={card} onChanged={invalidate} onError={setError} />
+            <CommentsPanel card={card} onChanged={invalidate} onError={setError} />
+            <ActivityPanel card={card} />
+          </div>
+        </aside>
+      </div>
+      {deleteOpen ? (
+        <DialogShell title="이 자료를 삭제할까요?" description="삭제하면 다시 복구할 수 없습니다." onClose={() => { if (!remove.isPending) setDeleteOpen(false); }}>
+          <div className="delete-warning"><CircleAlert size={20} /><div><strong>{card.title}</strong><p>댓글, 보완 자료, 첨부 파일, 반영 요청도 함께 삭제됩니다.</p></div></div>
+          <div className="modal-actions"><button className="secondary-button" type="button" onClick={() => setDeleteOpen(false)} disabled={remove.isPending}>취소</button><button className="danger-button" type="button" onClick={() => remove.mutate()} disabled={remove.isPending}>{remove.isPending ? <LoaderCircle className="spin" size={17} /> : <Trash2 size={17} />}영구 삭제</button></div>
+        </DialogShell>
+      ) : null}
+    </>
   );
 }
 

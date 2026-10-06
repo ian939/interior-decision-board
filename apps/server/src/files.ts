@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { basename, extname, resolve } from "node:path";
-import { writeFile } from "node:fs/promises";
+import { unlink, writeFile } from "node:fs/promises";
 import type { MultipartFile } from "@fastify/multipart";
 import type { AppConfig } from "./config.js";
 import { createId } from "./database.js";
@@ -61,4 +61,18 @@ export async function saveBuffer(
     size: buffer.byteLength,
     checksum: createHash("sha256").update(buffer).digest("hex"),
   };
+}
+
+export async function removeStoredFiles(storedNames: string[], appConfig: AppConfig): Promise<void> {
+  const uploadRoot = resolve(appConfig.uploadDir);
+  await Promise.all(
+    [...new Set(storedNames)].map(async (storedName) => {
+      if (!storedName || basename(storedName) !== storedName) return;
+      try {
+        await unlink(resolve(uploadRoot, storedName));
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+      }
+    }),
+  );
 }

@@ -98,4 +98,43 @@ describe("decision workflow", () => {
     expect(store.getQueueStats()).toMatchObject({ queued: 1, processing: 0 });
     expect(store.claimNextJob()?.id).toBe(claimed?.id);
   });
+
+  it("deletes a card with its dependent records and queued jobs", () => {
+    const owner = store.getUserByRole("owner")!;
+    const kitchen = store.listSpaces().find((space) => space.name === "주방")!;
+    const card = store.createCard({
+      title: "삭제할 주방 자료",
+      sourceUrl: "https://example.com/delete-me",
+      sourceType: "web",
+      sourceChannel: "web",
+      createdBy: owner.id,
+      aiStatus: "queued",
+    });
+    const attachment = store.createAttachment({
+      cardId: card.id,
+      originalName: "sample.jpg",
+      storedName: "stored-sample.jpg",
+      mimeType: "image/jpeg",
+      size: 123,
+      checksum: "checksum",
+      kind: "source",
+    });
+    const related = store.createRelatedUrl(card.id, owner.id, "https://example.com/related", "web");
+    store.transitionCard(card.id, owner.id, { status: "reviewing", spaceIds: [kitchen.id] });
+    store.transitionCard(card.id, owner.id, { status: "approved" });
+    store.transitionCard(card.id, owner.id, {
+      status: "requested",
+      workRequestTitle: "삭제될 요청",
+      workRequestBody: "삭제 검증",
+    });
+
+    expect(store.deleteCard(card.id)).toEqual({ deleted: true, storedNames: ["stored-sample.jpg"] });
+    expect(store.getCard(card.id)).toBeNull();
+    expect(store.getAttachmentRow(attachment.id)).toBeNull();
+    expect(store.getRelatedSourceRow(related.id)).toBeNull();
+    expect(store.listDashboard().cards).toHaveLength(0);
+    expect(store.listWorkRequests()).toHaveLength(0);
+    expect(store.getQueueStats()).toMatchObject({ queued: 0, processing: 0, failed: 0 });
+    expect(store.deleteCard(card.id)).toEqual({ deleted: false, storedNames: [] });
+  });
 });

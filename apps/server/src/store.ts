@@ -247,6 +247,38 @@ export class Store {
     };
   }
 
+  deleteCard(cardId: string): { deleted: boolean; storedNames: string[] } {
+    if (!this.cardExists(cardId)) return { deleted: false, storedNames: [] };
+    const storedNames = (this.db.prepare("SELECT stored_name FROM attachments WHERE card_id = ?").all(cardId) as DbRow[]).map((row) =>
+      text(row.stored_name),
+    );
+    const relatedIds = new Set(
+      (this.db.prepare("SELECT id FROM related_sources WHERE card_id = ?").all(cardId) as DbRow[]).map((row) => text(row.id)),
+    );
+    const jobIds = (this.db.prepare("SELECT id, payload FROM jobs").all() as DbRow[])
+      .filter((row) => {
+        try {
+          const payload = JSON.parse(text(row.payload)) as Record<string, unknown>;
+          return payload.cardId === cardId || (typeof payload.relatedSourceId === "string" && relatedIds.has(payload.relatedSourceId));
+        } catch {
+          return false;
+        }
+      })
+      .map((row) => text(row.id));
+
+    this.db.exec("BEGIN");
+    try {
+      const deleteJob = this.db.prepare("DELETE FROM jobs WHERE id = ?");
+      for (const jobId of jobIds) deleteJob.run(jobId);
+      this.db.prepare("DELETE FROM cards WHERE id = ?").run(cardId);
+      this.db.exec("COMMIT");
+    } catch (error) {
+      this.db.exec("ROLLBACK");
+      throw error;
+    }
+    return { deleted: true, storedNames };
+  }
+
   transitionCard(cardId: string, actorId: string, input: TransitionInput): CardDetail {
     const row = this.db.prepare("SELECT * FROM cards WHERE id = ?").get(cardId) as DbRow | undefined;
     if (!row) throw new Error("CARD_NOT_FOUND");
