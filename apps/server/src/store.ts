@@ -7,6 +7,8 @@ import type {
   Comment,
   Comparison,
   DashboardResponse,
+  PlannerItem,
+  PlannerLayout,
   PreferenceValue,
   RelatedSource,
   SourceType,
@@ -31,6 +33,15 @@ function jsonArray(value: unknown): string[] {
   try {
     const parsed = JSON.parse(String(value ?? "[]"));
     return Array.isArray(parsed) ? parsed.map(String) : [];
+  } catch {
+    return [];
+  }
+}
+
+function plannerItems(value: unknown): PlannerItem[] {
+  try {
+    const parsed = JSON.parse(String(value ?? "[]"));
+    return Array.isArray(parsed) ? (parsed as PlannerItem[]) : [];
   } catch {
     return [];
   }
@@ -120,6 +131,39 @@ export class Store {
         id,
       );
     return this.spaceFromRow(this.db.prepare("SELECT * FROM spaces WHERE id = ?").get(id) as DbRow);
+  }
+
+  listPlannerLayouts(): PlannerLayout[] {
+    return (this.db.prepare("SELECT * FROM planner_layouts ORDER BY updated_at DESC").all() as DbRow[]).map((row) =>
+      this.plannerLayoutFromRow(row),
+    );
+  }
+
+  createPlannerLayout(userId: string, name: string, items: PlannerItem[]): PlannerLayout {
+    const id = createId();
+    const timestamp = now();
+    this.db
+      .prepare("INSERT INTO planner_layouts (id, name, items_json, created_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)")
+      .run(id, name.trim(), JSON.stringify(items), userId, timestamp, timestamp);
+    return this.plannerLayoutFromRow(this.db.prepare("SELECT * FROM planner_layouts WHERE id = ?").get(id) as DbRow);
+  }
+
+  updatePlannerLayout(id: string, input: { name?: string; items?: PlannerItem[] }): PlannerLayout | null {
+    const current = this.db.prepare("SELECT * FROM planner_layouts WHERE id = ?").get(id) as DbRow | undefined;
+    if (!current) return null;
+    this.db
+      .prepare("UPDATE planner_layouts SET name = ?, items_json = ?, updated_at = ? WHERE id = ?")
+      .run(
+        input.name?.trim() || text(current.name),
+        input.items === undefined ? text(current.items_json) : JSON.stringify(input.items),
+        now(),
+        id,
+      );
+    return this.plannerLayoutFromRow(this.db.prepare("SELECT * FROM planner_layouts WHERE id = ?").get(id) as DbRow);
+  }
+
+  deletePlannerLayout(id: string): boolean {
+    return Number(this.db.prepare("DELETE FROM planner_layouts WHERE id = ?").run(id).changes) > 0;
   }
 
   createCard(input: CreateCardInput): CardDetail {
@@ -807,6 +851,19 @@ export class Store {
       kind: text(row.kind) as Attachment["kind"],
       url: `/api/files/${text(row.id)}`,
       createdAt: text(row.created_at),
+    };
+  }
+
+  private plannerLayoutFromRow(row: DbRow): PlannerLayout {
+    const createdBy = this.getUserById(text(row.created_by));
+    if (!createdBy) throw new Error(`배치안 생성자를 찾을 수 없습니다: ${text(row.id)}`);
+    return {
+      id: text(row.id),
+      name: text(row.name),
+      items: plannerItems(row.items_json),
+      createdBy,
+      createdAt: text(row.created_at),
+      updatedAt: text(row.updated_at),
     };
   }
 }

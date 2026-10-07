@@ -49,6 +49,7 @@ import {
   Paperclip,
   Plus,
   RefreshCw,
+  Ruler,
   Search,
   Settings,
   Sparkles,
@@ -60,8 +61,9 @@ import {
 } from "lucide-react";
 import { ApiError, api, downloadExport, getToken, mediaUrl, setToken } from "./api";
 import { ProjectReferencesView } from "./ProjectReferences";
+import { SpacePlannerView } from "./SpacePlanner";
 
-type View = "board" | "references" | "requests" | "settings";
+type View = "board" | "references" | "planner" | "requests" | "settings";
 
 function readableError(error: unknown): string {
   return error instanceof Error ? error.message : "요청 처리 중 오류가 발생했습니다.";
@@ -268,6 +270,9 @@ function AuthenticatedApp({ user, onLogout }: { user: UserSummary; onLogout: () 
           <button className={view === "references" ? "active" : ""} onClick={() => { setView("references"); setMobileMenu(false); }}>
             <MapIcon size={19} /><span>도면·아이디어</span>
           </button>
+          <button className={view === "planner" ? "active" : ""} onClick={() => { setView("planner"); setMobileMenu(false); }}>
+            <Ruler size={19} /><span>배치 실험실</span>
+          </button>
           <button className={view === "requests" ? "active" : ""} onClick={() => { setView("requests"); setMobileMenu(false); }}>
             <ClipboardCheck size={19} /><span>반영 요청</span><span className="nav-count">{dashboard.data?.counts.requested ?? 0}</span>
           </button>
@@ -306,6 +311,7 @@ function AuthenticatedApp({ user, onLogout }: { user: UserSummary; onLogout: () 
           />
         ) : null}
         {view === "references" ? <ProjectReferencesView /> : null}
+        {view === "planner" ? <SpacePlannerView /> : null}
         {view === "requests" ? <WorkRequestsView onOpenCard={openCard} /> : null}
         {view === "settings" ? <SettingsView user={user} /> : null}
       </main>

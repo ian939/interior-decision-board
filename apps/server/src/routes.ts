@@ -1,7 +1,7 @@
 import { createReadStream, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import type { FastifyInstance, FastifyReply } from "fastify";
-import { preferenceSchema, sourceTypeSchema, transitionInputSchema } from "@interior/shared";
+import { plannerItemSchema, preferenceSchema, sourceTypeSchema, transitionInputSchema } from "@interior/shared";
 import { z } from "zod";
 import type { AppConfig } from "./config.js";
 import { createSessionToken, verifyPassword } from "./auth.js";
@@ -34,6 +34,15 @@ const spaceUpdateSchema = z.object({
   active: z.boolean().optional(),
   sortOrder: z.number().int().min(0).max(500).optional(),
 });
+const plannerItemsSchema = z.array(plannerItemSchema).max(200);
+const plannerLayoutCreateSchema = z.object({
+  name: z.string().trim().min(1).max(80),
+  items: plannerItemsSchema.optional().default([]),
+});
+const plannerLayoutUpdateSchema = z.object({
+  name: z.string().trim().min(1).max(80).optional(),
+  items: plannerItemsSchema.optional(),
+}).refine((value) => value.name !== undefined || value.items !== undefined);
 
 function errorReply(reply: FastifyReply, error: unknown): void {
   const message = error instanceof Error ? error.message : String(error);
@@ -298,6 +307,31 @@ export function registerRoutes(
   app.get("/api/work-requests", async (request, reply) => {
     if (!requireUser(request, reply, store, appConfig)) return;
     return { items: store.listWorkRequests() };
+  });
+
+  app.get("/api/planner/layouts", async (request, reply) => {
+    if (!requireUser(request, reply, store, appConfig)) return;
+    return { layouts: store.listPlannerLayouts() };
+  });
+
+  app.post("/api/planner/layouts", async (request, reply) => {
+    const user = requireUser(request, reply, store, appConfig);
+    if (!user) return;
+    const parsed = plannerLayoutCreateSchema.safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send({ error: "배치안 정보를 확인하세요." });
+    return reply.code(201).send(store.createPlannerLayout(user.id, parsed.data.name, parsed.data.items));
+  });
+
+  app.patch<{ Params: { id: string } }>("/api/planner/layouts/:id", async (request, reply) => {
+    if (!requireUser(request, reply, store, appConfig)) return;
+    const parsed = plannerLayoutUpdateSchema.safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send({ error: "배치안 수정 내용을 확인하세요." });
+    return store.updatePlannerLayout(request.params.id, parsed.data) ?? reply.code(404).send({ error: "배치안을 찾을 수 없습니다." });
+  });
+
+  app.delete<{ Params: { id: string } }>("/api/planner/layouts/:id", async (request, reply) => {
+    if (!requireUser(request, reply, store, appConfig)) return;
+    return store.deletePlannerLayout(request.params.id) ? { ok: true } : reply.code(404).send({ error: "배치안을 찾을 수 없습니다." });
   });
 
   app.patch<{ Params: { id: string } }>("/api/work-requests/:id", async (request, reply) => {

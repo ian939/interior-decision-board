@@ -17,7 +17,7 @@
     "test": "vitest run",
     "test:e2e": "node scripts/e2e.mjs",
     "test:watch": "vitest",
-    "typecheck": "npm run typecheck -w @interior/shared && npm run typecheck -w @interior/server && npm run typecheck -w @interior/web"
+    "typecheck": "npm run build -w @interior/shared && npm run typecheck -w @interior/server && npm run typecheck -w @interior/web"
   },
   "devDependencies": {
     "@types/node": "^24.7.0",

@@ -53,6 +53,26 @@ try {
   await page.getByRole("button", { name: /슬라이드 7 보기/ }).click();
   await page.getByRole("heading", { name: "주방 수전 · 아일랜드 설비" }).waitFor();
   await page.screenshot({ path: resolve(outputDir, "07-references-brief-desktop.png"), fullPage: true });
+  await page.getByRole("button", { name: /배치 실험실/ }).click();
+  await page.getByRole("heading", { name: "가구 배치 실험실" }).waitFor();
+  const firstLayoutButton = page.getByRole("button", { name: "배치안 1 만들기" });
+  if (await firstLayoutButton.isVisible()) await firstLayoutButton.click();
+  else await page.getByRole("button", { name: /새 배치안/ }).click();
+  const layoutName = page.getByLabel("배치안 이름");
+  await layoutName.waitFor();
+  await layoutName.fill("E2E 배치안");
+  await page.getByRole("button", { name: /3인 소파/ }).click();
+  await page.getByRole("button", { name: /식탁 4인/ }).click();
+  await page.getByRole("heading", { name: "치수와 배치" }).waitFor();
+  await page.locator(".planner-item.colliding").first().waitFor();
+  if (await page.locator(".planner-item.colliding").count() < 2) throw new Error("겹침 표시가 두 가구에 적용되지 않았습니다.");
+  await page.locator(".planner-clearance").waitFor();
+  await page.getByRole("button", { name: "90° 회전" }).click();
+  await page.getByRole("button", { name: "저장", exact: true }).click();
+  await page.getByText("저장됨", { exact: true }).waitFor();
+  await page.screenshot({ path: resolve(outputDir, "09-space-planner-desktop.png"), fullPage: true });
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "배치안 삭제" }).click();
   const token = await page.evaluate(() => localStorage.getItem("interior-decision-token"));
   await desktop.close();
 
@@ -67,13 +87,18 @@ try {
   await mobilePage.getByRole("heading", { name: "도면과 기존 아이디어" }).waitFor();
   await mobilePage.waitForTimeout(300);
   await mobilePage.screenshot({ path: resolve(outputDir, "08-references-mobile.png"), fullPage: true });
+  await mobilePage.getByRole("button", { name: "메뉴 열기" }).click();
+  await mobilePage.getByRole("button", { name: /배치 실험실/ }).click();
+  await mobilePage.getByRole("heading", { name: "가구 배치 실험실" }).waitFor();
+  await mobilePage.waitForTimeout(300);
+  await mobilePage.screenshot({ path: resolve(outputDir, "10-space-planner-mobile.png"), fullPage: true });
   await mobile.close();
 
   console.log(
     JSON.stringify(
       {
         ok: true,
-        assertions: ["login", "desktop_board", "card_drawer", "card_delete_confirmation", "mobile_board", "reference_plans", "reference_plan_orientation", "reference_ideas", "reference_brief", "reference_mobile"],
+        assertions: ["login", "desktop_board", "card_drawer", "card_delete_confirmation", "mobile_board", "reference_plans", "reference_plan_orientation", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
         outputDir,
       },
       null,

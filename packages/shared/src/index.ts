@@ -130,6 +130,34 @@ export interface WorkRequest {
   thumbnailUrl: string | null;
 }
 
+export const plannerCategories = ["bed", "storage", "seating", "table", "appliance", "kitchen", "desk", "custom"] as const;
+export const plannerCategorySchema = z.enum(plannerCategories);
+export type PlannerCategory = z.infer<typeof plannerCategorySchema>;
+
+export const plannerItemSchema = z.object({
+  id: z.string().min(1).max(100),
+  label: z.string().trim().min(1).max(80),
+  category: plannerCategorySchema,
+  xMm: z.number().finite().min(0).max(12_000),
+  yMm: z.number().finite().min(0).max(12_550),
+  widthMm: z.number().finite().min(100).max(12_000),
+  depthMm: z.number().finite().min(100).max(12_550),
+  rotation: z.union([z.literal(0), z.literal(90)]),
+  clearanceMm: z.number().finite().min(0).max(3_000),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+});
+
+export type PlannerItem = z.infer<typeof plannerItemSchema>;
+
+export interface PlannerLayout {
+  id: string;
+  name: string;
+  items: PlannerItem[];
+  createdBy: UserSummary;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface CardSummary {
   id: string;
   title: string;

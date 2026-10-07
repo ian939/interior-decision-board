@@ -1,6 +1,8 @@
 import type {
   CardDetail,
   DashboardResponse,
+  PlannerItem,
+  PlannerLayout,
   PreferenceValue,
   SessionResponse,
   Space,
@@ -97,6 +99,12 @@ export const api = {
   workRequests: () => request<{ items: WorkRequest[] }>("/work-requests"),
   updateWorkRequest: (id: string, input: { title?: string; body?: string; completed?: boolean }) =>
     request<WorkRequest>(`/work-requests/${id}`, { method: "PATCH", body: JSON.stringify(input) }),
+  plannerLayouts: () => request<{ layouts: PlannerLayout[] }>("/planner/layouts"),
+  addPlannerLayout: (name: string, items: PlannerItem[] = []) =>
+    request<PlannerLayout>("/planner/layouts", { method: "POST", body: JSON.stringify({ name, items }) }),
+  updatePlannerLayout: (id: string, input: { name?: string; items?: PlannerItem[] }) =>
+    request<PlannerLayout>(`/planner/layouts/${id}`, { method: "PATCH", body: JSON.stringify(input) }),
+  deletePlannerLayout: (id: string) => request<{ ok: true }>(`/planner/layouts/${id}`, { method: "DELETE" }),
   spaces: () => request<{ spaces: Space[] }>("/spaces"),
   addSpace: (name: string) => request<Space>("/spaces", { method: "POST", body: JSON.stringify({ name }) }),
   updateSpace: (id: string, input: { name?: string; active?: boolean; sortOrder?: number }) =>

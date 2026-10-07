@@ -183,11 +183,21 @@ export function initializeDatabase(appConfig: AppConfig): DatabaseSync {
       created_at TEXT NOT NULL
     ) STRICT;
 
+    CREATE TABLE IF NOT EXISTS planner_layouts (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      items_json TEXT NOT NULL DEFAULT '[]',
+      created_by TEXT NOT NULL REFERENCES users(id),
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    ) STRICT;
+
     CREATE INDEX IF NOT EXISTS idx_cards_status_updated ON cards(status, updated_at DESC);
     CREATE INDEX IF NOT EXISTS idx_comments_card_created ON comments(card_id, created_at);
     CREATE INDEX IF NOT EXISTS idx_related_card_created ON related_sources(card_id, created_at);
     CREATE INDEX IF NOT EXISTS idx_activity_card_created ON activity_logs(card_id, created_at DESC);
     CREATE INDEX IF NOT EXISTS idx_jobs_status_run_after ON jobs(status, run_after);
+    CREATE INDEX IF NOT EXISTS idx_planner_layouts_updated ON planner_layouts(updated_at DESC);
   `);
 
   seedSpaces(db);

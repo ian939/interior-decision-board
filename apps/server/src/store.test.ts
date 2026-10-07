@@ -137,4 +137,30 @@ describe("decision workflow", () => {
     expect(store.getQueueStats()).toMatchObject({ queued: 0, processing: 0, failed: 0 });
     expect(store.deleteCard(card.id)).toEqual({ deleted: false, storedNames: [] });
   });
+
+  it("shares and updates scaled planner layouts", () => {
+    const owner = store.getUserByRole("owner")!;
+    const layout = store.createPlannerLayout(owner.id, "거실 A안", [
+      {
+        id: "sofa-1",
+        label: "3인 소파",
+        category: "seating",
+        xMm: 4_000,
+        yMm: 7_000,
+        widthMm: 2_200,
+        depthMm: 900,
+        rotation: 0,
+        clearanceMm: 600,
+        color: "#8fa58f",
+      },
+    ]);
+    expect(store.listPlannerLayouts()).toHaveLength(1);
+    expect(layout.items[0]?.widthMm).toBe(2_200);
+
+    const updated = store.updatePlannerLayout(layout.id, { name: "거실 B안", items: [] });
+    expect(updated?.name).toBe("거실 B안");
+    expect(updated?.items).toEqual([]);
+    expect(store.deletePlannerLayout(layout.id)).toBe(true);
+    expect(store.listPlannerLayouts()).toEqual([]);
+  });
 });
