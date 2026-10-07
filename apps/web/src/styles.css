@@ -490,19 +490,6 @@ a { color: inherit; }
 .planner-presets small { margin-top: 2px; color: var(--ink-soft); font-size: 7px; }
 .planner-presets svg { color: var(--sage); }
 .planner-canvas-panel { min-width: 0; }
-.planner-plan-variant { min-height: 55px; padding: 8px 10px; border-bottom: 1px solid var(--line-light); display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #fffdf8; }
-.planner-plan-variant > div:first-child { display: flex; flex-direction: column; gap: 2px; }
-.planner-plan-variant > div:first-child span { color: var(--ink-soft); font-size: 7px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-.planner-plan-variant > div:first-child strong { font-size: 11px; }
-.planner-plan-variant [role="group"] { display: flex; gap: 3px; padding: 3px; border-radius: 9px; background: #eceee9; }
-.planner-plan-variant button { min-height: 31px; padding: 0 12px; border: 0; border-radius: 7px; background: transparent; color: var(--ink-soft); font-size: 9px; font-weight: 700; cursor: pointer; }
-.planner-plan-variant button small { margin-left: 3px; padding: 2px 5px; border-radius: 99px; background: rgba(255,255,255,.55); font-size: 7px; }
-.planner-plan-variant button.active { background: white; color: var(--sage-deep); box-shadow: 0 1px 5px rgba(35,45,38,.12); }
-.planner-plan-variant button.active.renovation { background: #f5ead4; color: #825c1e; }
-.planner-renovation-summary { min-height: 37px; padding: 7px 10px; border-bottom: 1px solid #e8d3aa; display: flex; align-items: center; gap: 6px; overflow-x: auto; background: #fff7e8; color: #785a28; scrollbar-width: thin; }
-.planner-renovation-summary strong, .planner-renovation-summary span { white-space: nowrap; font-size: 7px; }
-.planner-renovation-summary strong { margin-right: 3px; font-size: 8px; }
-.planner-renovation-summary span { padding: 4px 7px; border: 1px solid #e8d3aa; border-radius: 99px; background: rgba(255,255,255,.65); }
 .planner-canvas-toolbar { min-height: 50px; padding: 7px 9px; border-bottom: 1px solid var(--line-light); display: flex; align-items: center; justify-content: space-between; gap: 9px; background: #f8f7f2; }
 .planner-canvas-toolbar > div { display: flex; align-items: center; gap: 3px; }
 .planner-canvas-toolbar > div:first-child > span { min-width: 40px; text-align: center; font-size: 8px; color: var(--ink-soft); }
@@ -512,45 +499,7 @@ a { color: inherit; }
 .planner-canvas-toolbar select { height: 24px; border: 0; border-radius: 6px; background: #eceae4; color: var(--ink); font-size: 8px; }
 .planner-canvas-scroll { height: 690px; padding: 15px; overflow: auto; position: relative; display: flex; align-items: flex-start; justify-content: center; background: #dfe3dd; scrollbar-width: thin; }
 .planner-canvas { height: auto; flex: none; display: block; filter: drop-shadow(0 12px 25px rgba(35,45,38,.14)); touch-action: none; user-select: none; }
-.floor-plan-vector, .planner-source-overlay { pointer-events: none; }
-.floor-plan-paper { fill: #fbfaf5; stroke: none; }
-.floor-zone { stroke: none; }
-.floor-zone.bedroom { fill: #f5edd5; }
-.floor-zone.kitchen { fill: #efc883; }
-.floor-zone.living { fill: #f2bd6c; }
-.floor-zone.bath { fill: #dcebef; }
-.floor-zone.balcony { fill: #edf0e8; }
-.floor-zone.service { fill: #f3f0e7; }
-.floor-zone.entry { fill: #e9dfcd; }
-.floor-zone.common { fill: #e8e8e4; }
-.floor-zone.floor-renovation-expanded { fill: #f3dfb7; }
-.floor-walls rect, .floor-walls path { fill: none; stroke: #344139; stroke-width: 150; stroke-linejoin: miter; }
-.floor-walls .common-wall { stroke: #5f6962; stroke-width: 110; stroke-dasharray: none; }
-.floor-walls .renovated-wall { stroke: #8c6429; }
-.floor-renovation-features { stroke: #8c6429; stroke-width: 55; }
-.floor-renovation-storage { fill: #d8c3a2; }
-.floor-renovation-island { fill: #d3a164; }
-.floor-renovation-dressing { fill: rgba(167,139,92,.2); stroke-dasharray: 95 45; }
-.floor-renovation-badge circle { fill: #f0bf45; stroke: #57451d; stroke-width: 35; }
-.floor-renovation-badge > text:not(.floor-renovation-badge-label) { fill: #362d18; font-size: 210px; font-weight: 850; text-anchor: middle; }
-.floor-renovation-badge-label { fill: #694d20; font-size: 145px; font-weight: 800; paint-order: stroke; stroke: #fff7e8; stroke-width: 28px; }
-.floor-fixtures { fill: rgba(255,255,255,.24); stroke: #667269; stroke-width: 52; }
-.floor-fixtures line { fill: none; }
-.floor-stair line, .floor-stair polyline { fill: none; stroke: #5f6962; stroke-width: 58; stroke-linecap: square; stroke-linejoin: miter; }
-.floor-window line { stroke: #9ab2b2; stroke-width: 68; stroke-linecap: round; }
-.floor-door-gap { stroke: #fbfaf5; stroke-width: 205; }
-.floor-door-leaf, .floor-door path { fill: none; stroke: #69776d; stroke-width: 45; }
-.floor-door path { stroke-dasharray: 55 28; opacity: .8; }
-.floor-room-label { text-anchor: middle; pointer-events: none; }
-.floor-room-name { fill: #28382e; font-size: 260px; font-weight: 800; paint-order: stroke; stroke: rgba(255,255,255,.86); stroke-width: 36px; }
-.floor-room-note { fill: #647168; font-size: 145px; font-weight: 650; paint-order: stroke; stroke: rgba(255,255,255,.8); stroke-width: 25px; }
-.floor-room-label.compact .floor-room-name { font-size: 205px; }
-.floor-room-label.compact .floor-room-note { font-size: 120px; }
-.floor-dimension line { stroke: #52635a; stroke-width: 28; }
-.floor-dimension .extension { stroke-width: 18; stroke-dasharray: 50 35; opacity: .52; }
-.floor-dimension text { fill: #34483b; font-size: 180px; font-weight: 750; text-anchor: middle; paint-order: stroke; stroke: white; stroke-width: 22px; }
-.floor-dimension-label-bg { fill: rgba(255,255,255,.88); stroke: rgba(83,101,91,.3); stroke-width: 12; }
-.planner-source-overlay { opacity: .3; mix-blend-mode: multiply; }
+.planner-final-plan { pointer-events: none; }
 .planner-room-guide rect { fill: rgba(89,113,96,.09); stroke: #57705e; stroke-width: 20; stroke-dasharray: 65 40; }
 .planner-room-guide text { fill: #4d6654; font-size: 190px; font-weight: 700; paint-order: stroke; stroke: rgba(255,255,255,.9); stroke-width: 28px; }
 .planner-item { cursor: grab; outline: none; }
@@ -747,9 +696,6 @@ a { color: inherit; }
   .planner-layout-actions { grid-column: auto; }
   .planner-layout-actions .small-button { flex: 1 1 auto; }
   .planner-presets { grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .planner-plan-variant { align-items: stretch; flex-direction: column; }
-  .planner-plan-variant [role="group"] { width: 100%; }
-  .planner-plan-variant button { flex: 1; }
   .planner-canvas-toolbar { align-items: flex-start; flex-direction: column; }
   .planner-canvas-toolbar > div:nth-child(2) { width: 100%; flex-wrap: wrap; }
   .planner-canvas-scroll { height: 540px; padding: 8px; justify-content: flex-start; }

@@ -62,35 +62,14 @@ try {
   else await page.getByRole("button", { name: /새 배치안/ }).click();
   const layoutName = page.getByLabel("배치안 이름");
   await layoutName.waitFor();
-  await page.locator(".floor-plan-vector").waitFor();
-  const baseWallBounds = await page.locator(".floor-walls rect").first().evaluate((element) => (element).getBBox());
-  if (baseWallBounds.width <= 0 || baseWallBounds.height <= 0) throw new Error("기본도면 벽이 정상 렌더링되지 않습니다.");
-  const commonAreaBounds = await page.locator(".floor-common-area").evaluate((element) => (element).getBBox());
-  if (commonAreaBounds.x + commonAreaBounds.width <= 12_000) throw new Error("공용 홀·승강기·계단이 세대 폭 12,000mm 밖에 표시되지 않습니다.");
-  if (await page.locator(".floor-dimension").count() < 10) throw new Error("도면 외곽 치수선이 충분히 표시되지 않았습니다.");
-  await page.getByRole("button", { name: /요청 반영안/ }).click();
-  await page.locator('[data-plan-variant="renovation"]').waitFor();
-  if (await page.locator(".floor-renovation-badge").count() !== 7) throw new Error("요청 반영안 7개 항목이 모두 표시되지 않습니다.");
-  const bathTwoSize = await page.locator('[data-space="bath-2"]').evaluate((element) => ({ width: Number(element.getAttribute("width")), height: Number(element.getAttribute("height")) }));
-  if (bathTwoSize.width !== 2_100 || bathTwoSize.height !== 1_550) throw new Error("욕실 2가 기본 크기보다 확장되어 있습니다.");
-  const dressingY = Number(await page.locator('[data-space="dressing-room"]').getAttribute("y"));
-  if (dressingY !== 7_000) throw new Error("드레스룸이 방 3 위쪽에 배치되지 않았습니다.");
-  if (await page.locator('[data-door="entry-door"]').count() !== 1) throw new Error("현관 아래쪽 출입문이 하나가 아닙니다.");
-  const entryDoorTransform = await page.locator('[data-door="entry-door"]').getAttribute("transform");
-  if (!entryDoorTransform?.includes("11350 7000") || !entryDoorTransform.includes("180")) throw new Error("현관문이 아래쪽 벽에 배치되지 않았습니다.");
-  const roomTwoDoorTransform = await page.locator('[data-door="room-2-entry"]').getAttribute("transform");
-  if (!roomTwoDoorTransform?.includes("9460 4600") || !roomTwoDoorTransform.includes("180")) throw new Error("방 2 문이 아래쪽 벽에 배치되지 않았습니다.");
-  if (!(await page.locator('[data-door="room-4-entry"]').getAttribute("transform"))?.includes("7400 7000")) throw new Error("방 4 문이 위쪽 벽에 배치되지 않았습니다.");
-  const doorTransforms = await page.locator(".floor-door").evaluateAll((elements) => elements.map((element) => element.getAttribute("transform")));
-  if (doorTransforms.some((transform) => transform?.includes("10100 5650") || transform?.includes("11600 6050"))) throw new Error("현관 양쪽 문이 제거되지 않았습니다.");
-  if (await page.locator('.floor-renovation-storage[x="2300"]').count()) throw new Error("5번 위치의 붙박이장이 제거되지 않았습니다.");
-  await page.screenshot({ path: resolve(outputDir, "09b-space-planner-renovation.png"), fullPage: true });
-  await page.getByRole("button", { name: "기본도면", exact: true }).click();
-  await page.locator('[data-plan-variant="base"]').waitFor();
-  await page.getByRole("button", { name: "원본 대조" }).click();
-  await page.locator(".planner-source-overlay").waitFor();
-  await page.screenshot({ path: resolve(outputDir, "09a-space-planner-source-overlay.png"), fullPage: true });
-  await page.getByRole("button", { name: "원본 대조" }).click();
+  await page.locator(".planner-final-plan").waitFor();
+  const finalPlanImage = page.locator(".planner-final-plan image");
+  await finalPlanImage.waitFor();
+  const finalPlanHref = await finalPlanImage.getAttribute("href");
+  if (!finalPlanHref?.includes("floorplan-final.png")) throw new Error("확정한 최종 평면도가 배치 실험실에 표시되지 않습니다.");
+  if (await page.getByRole("button", { name: /요청 반영안/ }).count()) throw new Error("제거하기로 한 변경안 버튼이 남아 있습니다.");
+  if (await page.locator(".floor-plan-vector").count()) throw new Error("폐기한 벡터 변경안이 남아 있습니다.");
+  await page.screenshot({ path: resolve(outputDir, "09-space-planner-final-plan.png"), fullPage: true });
   await layoutName.fill("E2E 배치안");
   await page.getByRole("button", { name: /3인 소파/ }).click();
   await page.getByRole("button", { name: /식탁 4인/ }).click();
@@ -129,7 +108,7 @@ try {
     JSON.stringify(
       {
         ok: true,
-        assertions: ["login", "desktop_board", "card_drawer", "story_image_picker", "card_delete_confirmation", "mobile_board", "reference_plans", "reference_plan_orientation", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_vector_plan", "space_planner_wall_render", "space_planner_common_area_outside_unit", "space_planner_dimensions", "space_planner_renovation_variant", "space_planner_corrected_doors", "space_planner_bath_not_expanded", "space_planner_dressing_top", "space_planner_source_overlay", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
+        assertions: ["login", "desktop_board", "card_drawer", "story_image_picker", "card_delete_confirmation", "mobile_board", "reference_plans", "reference_plan_orientation", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_final_plan", "space_planner_single_plan", "space_planner_change_variant_removed", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
         outputDir,
       },
       null,

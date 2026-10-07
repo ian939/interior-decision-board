@@ -3,12 +3,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { PlannerCategory, PlannerItem, PlannerLayout } from "@interior/shared";
 import { Check, CircleAlert, Copy, Grid3X3, LoaderCircle, Minus, Move, Plus, RotateCw, Save, Trash2, ZoomIn, ZoomOut } from "lucide-react";
 import { api } from "./api";
-import { FloorPlanDrawing, type FloorPlanVariant } from "./FloorPlanDrawing";
 
 const PLAN_WIDTH = 12_000;
 const PLAN_HEIGHT = 12_550;
-const PLAN_IMAGE = `${import.meta.env.BASE_URL}project-assets/plans/floorplan-base.png`;
-const DRAWING_VIEWBOX = { x: -1_550, y: -1_400, width: 17_250, height: 15_150 } as const;
+const PLAN_IMAGE = `${import.meta.env.BASE_URL}project-assets/plans/floorplan-final.png`;
+const DRAWING_VIEWBOX = { x: -2_200, y: -1_800, width: 17_450, height: 15_700 } as const;
 
 type FurniturePreset = {
   label: string;
@@ -50,13 +49,6 @@ const roomGuides = [
   { id: "balcony", label: "베란다", x: 1_250, y: 11_150, width: 6_900, depth: 1_300 },
 ] as const;
 
-const renovationRoomGuides = roomGuides.map((zone) => {
-  if (zone.id === "room-1") return { ...zone, x: 100, y: 300, width: 3_450, depth: 4_250 };
-  if (zone.id === "room-3") return { ...zone, x: 100, y: 7_050, width: 3_450, depth: 5_400 };
-  if (zone.id === "living") return { ...zone, x: 3_650, y: 4_700, width: 3_250, depth: 7_700 };
-  return zone;
-});
-
 function readableError(error: unknown): string {
   return error instanceof Error ? error.message : "요청 처리 중 오류가 발생했습니다.";
 }
@@ -97,8 +89,6 @@ export function SpacePlannerView(): ReactNode {
   const [zoom, setZoom] = useState(1);
   const [showGrid, setShowGrid] = useState(true);
   const [showGuides, setShowGuides] = useState(false);
-  const [showSource, setShowSource] = useState(false);
-  const [planVariant, setPlanVariant] = useState<FloorPlanVariant>("base");
   const [snapMm, setSnapMm] = useState(100);
   const [dragging, setDragging] = useState<{ id: string; offsetX: number; offsetY: number } | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -149,7 +139,6 @@ export function SpacePlannerView(): ReactNode {
   });
 
   const selected = items.find((item) => item.id === selectedId) ?? null;
-  const activeRoomGuides = planVariant === "renovation" ? renovationRoomGuides : roomGuides;
   const collisionIds = useMemo(() => {
     const result = new Set<string>();
     for (let first = 0; first < items.length; first += 1) {
@@ -170,8 +159,8 @@ export function SpacePlannerView(): ReactNode {
     const rect = itemRect(selected);
     const centerX = rect.x + rect.width / 2;
     const centerY = rect.y + rect.depth / 2;
-    return activeRoomGuides.find((zone) => centerX >= zone.x && centerX <= zone.x + zone.width && centerY >= zone.y && centerY <= zone.y + zone.depth) ?? null;
-  }, [activeRoomGuides, selected]);
+    return roomGuides.find((zone) => centerX >= zone.x && centerX <= zone.x + zone.width && centerY >= zone.y && centerY <= zone.y + zone.depth) ?? null;
+  }, [selected]);
 
   const selectedIssues = useMemo(() => {
     if (!selected) return [];
@@ -342,17 +331,9 @@ export function SpacePlannerView(): ReactNode {
             </aside>
 
             <main className="planner-canvas-panel">
-              <div className="planner-plan-variant">
-                <div><span>도면 버전</span><strong>{planVariant === "base" ? "기본도면" : "요청 반영안"}</strong></div>
-                <div role="group" aria-label="도면 버전 선택">
-                  <button className={planVariant === "base" ? "active" : ""} onClick={() => setPlanVariant("base")} aria-pressed={planVariant === "base"}>기본도면</button>
-                  <button className={planVariant === "renovation" ? "active renovation" : "renovation"} onClick={() => setPlanVariant("renovation")} aria-pressed={planVariant === "renovation"}>요청 반영안 <small>7개</small></button>
-                </div>
-              </div>
-              {planVariant === "renovation" ? <div className="planner-renovation-summary"><strong>확장·구조 변경 반영</strong><span>현관 수납</span><span>욕실 내부 배치</span><span>아일랜드</span><span>방 1 확장</span><span>붙박이 제거·문</span><span>방 3·드레스룸</span><span>거실 확장</span></div> : null}
               <div className="planner-canvas-toolbar">
                 <div><button className="icon-button subtle" onClick={() => setZoom((value) => clamp(value - .15, .7, 1.9))} aria-label="축소"><ZoomOut size={17} /></button><span>{Math.round(zoom * 100)}%</span><button className="icon-button subtle" onClick={() => setZoom((value) => clamp(value + .15, .7, 1.9))} aria-label="확대"><ZoomIn size={17} /></button></div>
-                <div><button className={showGrid ? "active" : ""} onClick={() => setShowGrid((value) => !value)}><Grid3X3 size={15} />500mm 격자</button><button className={showGuides ? "active" : ""} onClick={() => setShowGuides((value) => !value)}><Move size={15} />공간 가이드</button><button className={showSource ? "active" : ""} onClick={() => setShowSource((value) => !value)}>원본 대조</button><label>스냅<select value={snapMm} onChange={(event) => setSnapMm(Number(event.target.value))}><option value={50}>50mm</option><option value={100}>100mm</option><option value={300}>300mm</option></select></label></div>
+                <div><button className={showGrid ? "active" : ""} onClick={() => setShowGrid((value) => !value)}><Grid3X3 size={15} />500mm 격자</button><button className={showGuides ? "active" : ""} onClick={() => setShowGuides((value) => !value)}><Move size={15} />공간 가이드</button><label>스냅<select value={snapMm} onChange={(event) => setSnapMm(Number(event.target.value))}><option value={50}>50mm</option><option value={100}>100mm</option><option value={300}>300mm</option></select></label></div>
               </div>
               <div className="planner-canvas-scroll">
                 <svg
@@ -369,15 +350,13 @@ export function SpacePlannerView(): ReactNode {
                 >
                   <defs>
                     <clipPath id="plan-clip"><rect width={PLAN_WIDTH} height={PLAN_HEIGHT} /></clipPath>
-                    <clipPath id="source-clip"><rect width="14200" height={PLAN_HEIGHT} /></clipPath>
                     <pattern id="planner-small-grid" width="500" height="500" patternUnits="userSpaceOnUse"><path d="M 500 0 L 0 0 0 500" fill="none" stroke="#789081" strokeWidth="10" opacity=".22" /></pattern>
                     <pattern id="planner-large-grid" width="1000" height="1000" patternUnits="userSpaceOnUse"><rect width="1000" height="1000" fill="url(#planner-small-grid)" /><path d="M 1000 0 L 0 0 0 1000" fill="none" stroke="#526b59" strokeWidth="16" opacity=".24" /></pattern>
                   </defs>
-                  <FloorPlanDrawing variant={planVariant} />
-                  {showSource ? <g clipPath="url(#source-clip)"><g className="planner-source-overlay" transform={`translate(${PLAN_WIDTH} 0) scale(-1 1)`}><image href={PLAN_IMAGE} x="-5353" y="-1930" width="20710" height="16191" preserveAspectRatio="none" /></g></g> : null}
+                  <g className="planner-final-plan"><image href={PLAN_IMAGE} x={-3650} y={-1895} width={19590} height={16937} preserveAspectRatio="none" /></g>
                   <g clipPath="url(#plan-clip)">
                     {showGrid ? <rect width={PLAN_WIDTH} height={PLAN_HEIGHT} fill="url(#planner-large-grid)" /> : null}
-                    {showGuides ? activeRoomGuides.map((zone) => <g className="planner-room-guide" key={zone.id}><rect x={zone.x} y={zone.y} width={zone.width} height={zone.depth} rx="70" /><text x={zone.x + 100} y={zone.y + 260}>{zone.label} · 근사</text></g>) : null}
+                    {showGuides ? roomGuides.map((zone) => <g className="planner-room-guide" key={zone.id}><rect x={zone.x} y={zone.y} width={zone.width} height={zone.depth} rx="70" /><text x={zone.x + 100} y={zone.y + 260}>{zone.label} · 근사</text></g>) : null}
                     {items.map((item) => {
                       const size = footprint(item);
                       const isSelected = item.id === selectedId;
@@ -394,7 +373,7 @@ export function SpacePlannerView(): ReactNode {
                   </g>
                 </svg>
               </div>
-              <div className="planner-canvas-foot"><span><i className="legend-item" />가구 실크기</span><span><i className="legend-clearance" />선택 가구 통로</span><span><i className="legend-collision" />겹침</span><small>새 벡터 도면은 실제 방향이며, ‘원본 대조’에서 좌우 반전한 원본과 겹쳐 볼 수 있습니다.</small></div>
+              <div className="planner-canvas-foot"><span><i className="legend-item" />가구 실크기</span><span><i className="legend-clearance" />선택 가구 통로</span><span><i className="legend-collision" />겹침</span><small>확정한 최종 평면도 한 장을 기준으로 가구 배치를 검토합니다.</small></div>
             </main>
 
             <aside className="planner-inspector">

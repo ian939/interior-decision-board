@@ -18,7 +18,7 @@ type ReferenceTab = "plans" | "concepts" | "brief";
 const asset = (path: string): string => `${import.meta.env.BASE_URL}project-assets/${path}`;
 
 const floorPlans = [
-  { src: asset("plans/floorplan-base.png"), alt: "한신무학 아파트 기본 평면도", label: "기본 평면도", caption: "41평 참고 도면 · 정확한 치수는 현장 실측으로 확정" },
+  { src: asset("plans/floorplan-final.png"), alt: "한신무학 아파트 최종 평면도", label: "최종 평면도", caption: "가구 배치 실험실 기준 도면 · 정확한 치수는 현장 실측으로 확정", fixedOrientation: true },
   { src: asset("plans/floorplan-points.png"), alt: "공사 포인트가 표시된 평면도", label: "공사 포인트 도면", caption: "확장·수납·아일랜드 계획 7개 지점" },
 ];
 
@@ -144,7 +144,10 @@ export function ProjectReferencesView(): ReactNode {
             </div>
           </div>
           <div className="floorplan-grid">
-            {floorPlans.map((plan) => <figure className="floorplan-card" key={plan.label}><button onClick={() => setPreview({ src: plan.src, alt: plan.alt, mirrored: mirroredPlan })}><img className={mirroredPlan ? "mirrored-plan-image" : undefined} src={plan.src} alt={plan.alt} /><span><Maximize2 size={15} /> 크게 보기</span></button><figcaption><div><strong>{plan.label}</strong><span className="plan-orientation-badge">{mirroredPlan ? "좌우 반전 · 현관 왼쪽 진입" : "원본 · 현관 오른쪽 진입"}</span></div><p>{plan.caption}</p></figcaption></figure>)}
+            {floorPlans.map((plan) => {
+              const shouldMirror = !plan.fixedOrientation && mirroredPlan;
+              return <figure className="floorplan-card" key={plan.label}><button onClick={() => setPreview({ src: plan.src, alt: plan.alt, mirrored: shouldMirror })}><img className={shouldMirror ? "mirrored-plan-image" : undefined} src={plan.src} alt={plan.alt} /><span><Maximize2 size={15} /> 크게 보기</span></button><figcaption><div><strong>{plan.label}</strong><span className="plan-orientation-badge">{plan.fixedOrientation ? "확정 방향" : mirroredPlan ? "좌우 반전 · 현관 왼쪽 진입" : "원본 · 현관 오른쪽 진입"}</span></div><p>{plan.caption}</p></figcaption></figure>;
+            })}
           </div>
           <div className="plan-detail-grid">
             <section className="renovation-points"><div className="reference-card-title"><Ruler size={18} /><div><strong>공사 포인트 7</strong><span>표시 도면 번호와 연결됩니다.</span></div></div>{renovationPoints.map(([number, title, detail]) => <article key={number}><span>{number}</span><div><strong>{title}</strong><p>{detail}</p></div></article>)}</section>
