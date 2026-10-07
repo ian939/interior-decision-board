@@ -52,7 +52,6 @@ const roomGuides = [
 
 const renovationRoomGuides = roomGuides.map((zone) => {
   if (zone.id === "room-1") return { ...zone, x: 100, y: 300, width: 3_450, depth: 4_250 };
-  if (zone.id === "bath-2") return { ...zone, x: 6_250, y: 4_250, width: 2_400, depth: 1_850 };
   if (zone.id === "room-3") return { ...zone, x: 100, y: 7_050, width: 3_450, depth: 5_400 };
   if (zone.id === "living") return { ...zone, x: 3_650, y: 4_700, width: 3_250, depth: 7_700 };
   return zone;
@@ -350,7 +349,7 @@ export function SpacePlannerView(): ReactNode {
                   <button className={planVariant === "renovation" ? "active renovation" : "renovation"} onClick={() => setPlanVariant("renovation")} aria-pressed={planVariant === "renovation"}>요청 반영안 <small>7개</small></button>
                 </div>
               </div>
-              {planVariant === "renovation" ? <div className="planner-renovation-summary"><strong>확장·구조 변경 반영</strong><span>현관 수납</span><span>욕실 확장</span><span>아일랜드</span><span>방 1 확장</span><span>수납 분리</span><span>방 3·드레스룸</span><span>거실 확장</span></div> : null}
+              {planVariant === "renovation" ? <div className="planner-renovation-summary"><strong>확장·구조 변경 반영</strong><span>현관 수납</span><span>욕실 내부 배치</span><span>아일랜드</span><span>방 1 확장</span><span>수납 분리</span><span>방 3·드레스룸</span><span>거실 확장</span></div> : null}
               <div className="planner-canvas-toolbar">
                 <div><button className="icon-button subtle" onClick={() => setZoom((value) => clamp(value - .15, .7, 1.9))} aria-label="축소"><ZoomOut size={17} /></button><span>{Math.round(zoom * 100)}%</span><button className="icon-button subtle" onClick={() => setZoom((value) => clamp(value + .15, .7, 1.9))} aria-label="확대"><ZoomIn size={17} /></button></div>
                 <div><button className={showGrid ? "active" : ""} onClick={() => setShowGrid((value) => !value)}><Grid3X3 size={15} />500mm 격자</button><button className={showGuides ? "active" : ""} onClick={() => setShowGuides((value) => !value)}><Move size={15} />공간 가이드</button><button className={showSource ? "active" : ""} onClick={() => setShowSource((value) => !value)}>원본 대조</button><label>스냅<select value={snapMm} onChange={(event) => setSnapMm(Number(event.target.value))}><option value={50}>50mm</option><option value={100}>100mm</option><option value={300}>300mm</option></select></label></div>
@@ -394,7 +393,6 @@ export function SpacePlannerView(): ReactNode {
                     <g className="planner-scale" transform="translate(430 11960)"><line x1="0" x2="1000" y1="0" y2="0" /><line x1="0" x2="0" y1="-70" y2="70" /><line x1="1000" x2="1000" y1="-70" y2="70" /><text x="500" y="-110">1,000mm</text></g>
                   </g>
                 </svg>
-                {items.length === 0 ? <div className="planner-canvas-empty"><Move size={22} /><strong>왼쪽에서 가구를 추가하세요</strong><span>추가한 가구를 도면 위에서 끌어 배치할 수 있습니다.</span></div> : null}
               </div>
               <div className="planner-canvas-foot"><span><i className="legend-item" />가구 실크기</span><span><i className="legend-clearance" />선택 가구 통로</span><span><i className="legend-collision" />겹침</span><small>새 벡터 도면은 실제 방향이며, ‘원본 대조’에서 좌우 반전한 원본과 겹쳐 볼 수 있습니다.</small></div>
             </main>

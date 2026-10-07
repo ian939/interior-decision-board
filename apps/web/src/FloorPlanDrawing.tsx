@@ -13,9 +13,9 @@ function RoomLabel({ x, y, label, note, compact = false }: RoomLabelProps): Reac
   );
 }
 
-function Door({ x, y, rotation = 0, size = 760 }: { x: number; y: number; rotation?: number; size?: number }): ReactNode {
+function Door({ x, y, rotation = 0, size = 760, marker }: { x: number; y: number; rotation?: number; size?: number; marker?: string }): ReactNode {
   return (
-    <g className="floor-door" transform={`translate(${x} ${y}) rotate(${rotation})`}>
+    <g className="floor-door" data-door={marker} transform={`translate(${x} ${y}) rotate(${rotation})`}>
       <line className="floor-door-gap" x1={-35} y1={0} x2={size + 35} y2={0} />
       <line className="floor-door-leaf" x1={0} y1={0} x2={0} y2={size} />
       <path d={`M 0 ${size} A ${size} ${size} 0 0 1 ${size} 0`} />
@@ -119,7 +119,7 @@ const bottomSegments = [
 
 export function FloorPlanDrawing({ variant = "base" }: { variant?: FloorPlanVariant }): ReactNode {
   const renovated = variant === "renovation";
-  const bathTwo = renovated ? { x: 6200, y: 4200, width: 2500, height: 2000 } : { x: 6500, y: 4300, width: 2100, height: 1550 };
+  const bathTwo = { x: 6500, y: 4300, width: 2100, height: 1550 };
 
   return (
     <g className={`floor-plan-vector ${renovated ? "renovation" : "base"}`} data-plan-variant={variant} aria-hidden="true">
@@ -133,7 +133,7 @@ export function FloorPlanDrawing({ variant = "base" }: { variant?: FloorPlanVari
         <rect className="floor-zone balcony" x={8700} y={0} width={3300} height={1300} />
         <rect className="floor-zone bedroom" x={8700} y={1300} width={2900} height={3300} />
         <rect className="floor-zone bath" x={0} y={5000} width={2300} height={2000} />
-        <rect className={`floor-zone bath ${renovated ? "floor-renovation-expanded" : ""}`} {...bathTwo} />
+        <rect className="floor-zone bath" data-space="bath-2" {...bathTwo} />
         <rect className="floor-zone entry" x={10100} y={5000} width={1500} height={2000} />
         {renovated ? <path className="floor-zone bedroom floor-renovation-expanded" d="M 0 7000 H 3600 V 12550 H 1200 V 11100 H 0 Z" /> : <rect className="floor-zone bedroom" x={0} y={7000} width={3600} height={4100} />}
         <rect className="floor-zone bedroom" x={7000} y={7000} width={2400} height={3500} />
@@ -144,7 +144,7 @@ export function FloorPlanDrawing({ variant = "base" }: { variant?: FloorPlanVari
           <rect className="floor-renovation-storage" x={2300} y={4650} width={1300} height={850} />
           <line x1={2950} y1={4650} x2={2950} y2={5500} />
           <rect className="floor-renovation-island" x={4950} y={3400} width={1500} height={850} rx={70} />
-          <rect className="floor-renovation-dressing" x={0} y={8600} width={3600} height={2500} />
+          <rect className="floor-renovation-dressing" data-space="dressing-room" x={0} y={7000} width={3600} height={1850} />
         </g> : null}
       </g>
 
@@ -155,7 +155,7 @@ export function FloorPlanDrawing({ variant = "base" }: { variant?: FloorPlanVari
         <rect x={8700} y={0} width={3300} height={1300} />
         <rect x={8700} y={1300} width={2900} height={3300} />
         <rect x={0} y={5000} width={2300} height={2000} />
-        <rect className={renovated ? "renovated-wall" : undefined} {...bathTwo} />
+        <rect {...bathTwo} />
         <rect x={10100} y={5000} width={1500} height={2000} />
         {renovated ? <path className="renovated-wall" d="M 0 7000 H 3600 V 12550 H 1200 V 11100 H 0 Z" /> : <rect x={0} y={7000} width={3600} height={4100} />}
         <rect x={7000} y={7000} width={2400} height={3500} />
@@ -168,8 +168,7 @@ export function FloorPlanDrawing({ variant = "base" }: { variant?: FloorPlanVari
       <g className="floor-fixtures">
         <rect x={5650} y={260} width={600} height={520} rx={45} /><circle cx={5830} cy={430} r={70} /><circle cx={6050} cy={430} r={70} /><rect x={3710} y={1100} width={300} height={1850} rx={35} />
         <rect x={bathTwo.x + 220} y={bathTwo.y + 180} width={560} height={700} rx={80} /><ellipse cx={bathTwo.x + 500} cy={bathTwo.y + 460} rx={150} ry={190} />
-        <rect x={bathTwo.x + 1000} y={bathTwo.y + 180} width={560} height={700} rx={80} /><ellipse cx={bathTwo.x + 1280} cy={bathTwo.y + 460} rx={150} ry={190} />
-        {renovated ? <rect className="floor-shower" x={bathTwo.x + 1700} y={bathTwo.y + 180} width={580} height={1500} rx={45} /> : null}
+        <rect className="floor-sink" x={bathTwo.x + 1120} y={bathTwo.y + 220} width={620} height={520} rx={70} /><circle cx={bathTwo.x + 1430} cy={bathTwo.y + 470} r={145} />
         <rect x={320} y={5300} width={520} height={700} rx={80} /><ellipse cx={580} cy={5600} rx={145} ry={190} /><rect x={1250} y={5250} width={720} height={1150} rx={60} />
         <line x1={10040} y1={9250} x2={10810} y2={10300} /><line x1={10810} y1={9250} x2={10040} y2={10300} /><StairMark />
       </g>
@@ -183,8 +182,8 @@ export function FloorPlanDrawing({ variant = "base" }: { variant?: FloorPlanVari
       </g>
 
       <g className="floor-doors">
-        <Door x={3600} y={3650} rotation={90} /><Door x={8700} y={3650} rotation={-90} /><Door x={2300} y={5400} rotation={90} size={700} /><Door x={3600} y={7500} rotation={90} /><Door x={7000} y={7550} rotation={90} />
-        <Door x={bathTwo.x + bathTwo.width} y={5000} rotation={90} size={650} /><Door x={10100} y={5650} rotation={90} size={720} /><Door x={11600} y={6050} rotation={-90} size={760} /><Door x={9400} y={7250} rotation={90} size={750} /><Door x={11250} y={7250} rotation={90} size={750} />
+        <Door marker="room-1-exit" x={2700} y={4600} rotation={0} /><Door marker="room-2-entry" x={8700} y={4500} rotation={-90} /><Door x={2300} y={5400} rotation={90} size={700} /><Door marker="room-3-entry" x={2500} y={7000} rotation={0} /><Door x={7000} y={7550} rotation={90} />
+        <Door marker="bath-2-entry" x={bathTwo.x + bathTwo.width} y={5000} rotation={90} size={650} /><Door x={10100} y={5650} rotation={90} size={720} /><Door x={11600} y={6050} rotation={-90} size={760} /><Door marker="common-entry" x={10100} y={7000} rotation={0} size={760} />
       </g>
 
       <g className="floor-room-labels">
@@ -192,15 +191,15 @@ export function FloorPlanDrawing({ variant = "base" }: { variant?: FloorPlanVari
         <RoomLabel x={1800} y={2850} label={renovated ? "방 1 · 확장" : "방 1"} note="침실" />
         <RoomLabel x={5050} y={1650} label="주방 · 식당" note="설비 위치 확인" /><RoomLabel x={7600} y={2650} label="다용도 · 복도" compact />
         <RoomLabel x={10350} y={720} label="발코니" compact /><RoomLabel x={10150} y={2850} label="방 2" note="침실" /><RoomLabel x={1150} y={5950} label="욕실 1" compact />
-        <RoomLabel x={bathTwo.x + bathTwo.width / 2} y={bathTwo.y + 900} label={renovated ? "욕실 2 · 확장" : "욕실 2"} compact /><RoomLabel x={10850} y={5950} label="현관" compact />
-        <RoomLabel x={1800} y={renovated ? 7900 : 8950} label={renovated ? "방 3 · 확장" : "방 3"} note="침실" /><RoomLabel x={5100} y={8100} label={renovated ? "거실 · 확장" : "거실"} note="가구 배치 중심" /><RoomLabel x={8200} y={8850} label="방 4" note="침실" />
+        <RoomLabel x={bathTwo.x + bathTwo.width / 2} y={bathTwo.y + 900} label="욕실 2" compact /><RoomLabel x={10850} y={5950} label="현관" compact />
+        <RoomLabel x={1800} y={renovated ? 9700 : 8950} label={renovated ? "방 3 · 확장" : "방 3"} note="침실" /><RoomLabel x={5100} y={8100} label={renovated ? "거실 · 확장" : "거실"} note="가구 배치 중심" /><RoomLabel x={8200} y={8850} label="방 4" note="침실" />
         <RoomLabel x={renovated ? 8200 : 5250} y={11850} label="발코니" compact /><RoomLabel x={10430} y={8250} label="공용 홀" compact /><RoomLabel x={10425} y={9850} label="승강기" compact /><RoomLabel x={12900} y={11200} label="계단" compact />
-        {renovated ? <><RoomLabel x={1800} y={9800} label="드레스룸" compact /><RoomLabel x={5700} y={3850} label="아일랜드" compact /></> : null}
+        {renovated ? <><RoomLabel x={1800} y={8050} label="드레스룸" compact /><RoomLabel x={5700} y={3850} label="아일랜드" compact /></> : null}
       </g>
 
       {renovated ? <g className="floor-renovation-badges">
-        <RenovationBadge x={11250} y={3900} number={1} label="현관 수납 확장" /><RenovationBadge x={8500} y={4400} number={2} label="욕실 확장" /><RenovationBadge x={6200} y={3500} number={3} label="아일랜드" />
-        <RenovationBadge x={350} y={650} number={4} label="침실 확장" /><RenovationBadge x={3350} y={4850} number={5} label="수납 분리" /><RenovationBadge x={3350} y={8750} number={6} label="드레스룸" /><RenovationBadge x={6750} y={11950} number={7} label="거실 확장" />
+        <RenovationBadge x={11250} y={3900} number={1} label="현관 수납 확장" /><RenovationBadge x={8350} y={4550} number={2} label="욕실 내부 배치" /><RenovationBadge x={6200} y={3500} number={3} label="아일랜드" />
+        <RenovationBadge x={350} y={650} number={4} label="침실 확장" /><RenovationBadge x={3350} y={4850} number={5} label="수납 분리" /><RenovationBadge x={3350} y={7350} number={6} label="드레스룸" /><RenovationBadge x={6750} y={11950} number={7} label="거실 확장" />
       </g> : null}
 
       <HorizontalDimension x1={0} x2={12000} y={-1050} label="세대 폭 12,000 mm" extensionTo={-80} />

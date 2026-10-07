@@ -71,6 +71,12 @@ try {
   await page.getByRole("button", { name: /요청 반영안/ }).click();
   await page.locator('[data-plan-variant="renovation"]').waitFor();
   if (await page.locator(".floor-renovation-badge").count() !== 7) throw new Error("요청 반영안 7개 항목이 모두 표시되지 않습니다.");
+  const bathTwoSize = await page.locator('[data-space="bath-2"]').evaluate((element) => ({ width: Number(element.getAttribute("width")), height: Number(element.getAttribute("height")) }));
+  if (bathTwoSize.width !== 2_100 || bathTwoSize.height !== 1_550) throw new Error("욕실 2가 기본 크기보다 확장되어 있습니다.");
+  const dressingY = Number(await page.locator('[data-space="dressing-room"]').getAttribute("y"));
+  if (dressingY !== 7_000) throw new Error("드레스룸이 방 3 위쪽에 배치되지 않았습니다.");
+  if (await page.locator('[data-door="common-entry"]').count() !== 1) throw new Error("공용부 출입문이 하나가 아닙니다.");
+  if (!(await page.locator('[data-door="room-2-entry"]').getAttribute("transform"))?.includes("8700 4500")) throw new Error("방 2 문이 아래쪽에 배치되지 않았습니다.");
   await page.screenshot({ path: resolve(outputDir, "09b-space-planner-renovation.png"), fullPage: true });
   await page.getByRole("button", { name: "기본도면", exact: true }).click();
   await page.locator('[data-plan-variant="base"]').waitFor();
@@ -116,7 +122,7 @@ try {
     JSON.stringify(
       {
         ok: true,
-        assertions: ["login", "desktop_board", "card_drawer", "story_image_picker", "card_delete_confirmation", "mobile_board", "reference_plans", "reference_plan_orientation", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_vector_plan", "space_planner_wall_render", "space_planner_common_area_outside_unit", "space_planner_dimensions", "space_planner_renovation_variant", "space_planner_source_overlay", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
+        assertions: ["login", "desktop_board", "card_drawer", "story_image_picker", "card_delete_confirmation", "mobile_board", "reference_plans", "reference_plan_orientation", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_vector_plan", "space_planner_wall_render", "space_planner_common_area_outside_unit", "space_planner_dimensions", "space_planner_renovation_variant", "space_planner_corrected_doors", "space_planner_bath_not_expanded", "space_planner_dressing_top", "space_planner_source_overlay", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
         outputDir,
       },
       null,

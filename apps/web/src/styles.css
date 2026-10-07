@@ -535,7 +535,6 @@ a { color: inherit; }
 .floor-renovation-badge > text:not(.floor-renovation-badge-label) { fill: #362d18; font-size: 210px; font-weight: 850; text-anchor: middle; }
 .floor-renovation-badge-label { fill: #694d20; font-size: 145px; font-weight: 800; paint-order: stroke; stroke: #fff7e8; stroke-width: 28px; }
 .floor-fixtures { fill: rgba(255,255,255,.24); stroke: #667269; stroke-width: 52; }
-.floor-fixtures .floor-shower { fill: rgba(180,216,224,.35); stroke: #64828a; }
 .floor-fixtures line { fill: none; }
 .floor-stair line, .floor-stair polyline { fill: none; stroke: #5f6962; stroke-width: 58; stroke-linecap: square; stroke-linejoin: miter; }
 .floor-window line { stroke: #9ab2b2; stroke-width: 68; stroke-linecap: round; }
@@ -564,9 +563,6 @@ a { color: inherit; }
 .planner-item-size { fill: rgba(23,36,28,.75); font-size: 145px; font-weight: 650; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
 .planner-scale line { stroke: #33483a; stroke-width: 30; }
 .planner-scale text { fill: #33483a; font-size: 165px; font-weight: 700; text-anchor: middle; paint-order: stroke; stroke: white; stroke-width: 26px; }
-.planner-canvas-empty { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); min-width: 245px; padding: 17px; border: 1px solid rgba(255,255,255,.65); border-radius: 13px; background: rgba(39,53,45,.84); color: white; backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; text-align: center; pointer-events: none; }
-.planner-canvas-empty strong { margin-top: 8px; font-size: 11px; }
-.planner-canvas-empty span { margin-top: 4px; color: rgba(255,255,255,.68); font-size: 8px; }
 .planner-canvas-foot { min-height: 39px; padding: 7px 12px; border-top: 1px solid var(--line-light); display: flex; align-items: center; flex-wrap: wrap; gap: 10px; color: var(--ink-soft); font-size: 7px; }
 .planner-canvas-foot > span { display: inline-flex; align-items: center; gap: 4px; }
 .planner-canvas-foot i { width: 12px; height: 8px; border-radius: 2px; display: inline-block; }
