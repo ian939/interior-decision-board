@@ -75,8 +75,15 @@ try {
   if (bathTwoSize.width !== 2_100 || bathTwoSize.height !== 1_550) throw new Error("욕실 2가 기본 크기보다 확장되어 있습니다.");
   const dressingY = Number(await page.locator('[data-space="dressing-room"]').getAttribute("y"));
   if (dressingY !== 7_000) throw new Error("드레스룸이 방 3 위쪽에 배치되지 않았습니다.");
-  if (await page.locator('[data-door="common-entry"]').count() !== 1) throw new Error("공용부 출입문이 하나가 아닙니다.");
-  if (!(await page.locator('[data-door="room-2-entry"]').getAttribute("transform"))?.includes("8700 4500")) throw new Error("방 2 문이 아래쪽에 배치되지 않았습니다.");
+  if (await page.locator('[data-door="entry-door"]').count() !== 1) throw new Error("현관 아래쪽 출입문이 하나가 아닙니다.");
+  const entryDoorTransform = await page.locator('[data-door="entry-door"]').getAttribute("transform");
+  if (!entryDoorTransform?.includes("11350 7000") || !entryDoorTransform.includes("180")) throw new Error("현관문이 아래쪽 벽에 배치되지 않았습니다.");
+  const roomTwoDoorTransform = await page.locator('[data-door="room-2-entry"]').getAttribute("transform");
+  if (!roomTwoDoorTransform?.includes("9460 4600") || !roomTwoDoorTransform.includes("180")) throw new Error("방 2 문이 아래쪽 벽에 배치되지 않았습니다.");
+  if (!(await page.locator('[data-door="room-4-entry"]').getAttribute("transform"))?.includes("7400 7000")) throw new Error("방 4 문이 위쪽 벽에 배치되지 않았습니다.");
+  const doorTransforms = await page.locator(".floor-door").evaluateAll((elements) => elements.map((element) => element.getAttribute("transform")));
+  if (doorTransforms.some((transform) => transform?.includes("10100 5650") || transform?.includes("11600 6050"))) throw new Error("현관 양쪽 문이 제거되지 않았습니다.");
+  if (await page.locator('.floor-renovation-storage[x="2300"]').count()) throw new Error("5번 위치의 붙박이장이 제거되지 않았습니다.");
   await page.screenshot({ path: resolve(outputDir, "09b-space-planner-renovation.png"), fullPage: true });
   await page.getByRole("button", { name: "기본도면", exact: true }).click();
   await page.locator('[data-plan-variant="base"]').waitFor();

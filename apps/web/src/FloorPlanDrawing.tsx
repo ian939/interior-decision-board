@@ -141,8 +141,6 @@ export function FloorPlanDrawing({ variant = "base" }: { variant?: FloorPlanVari
         <path className="floor-zone common floor-common-area" d="M 9400 7000 H 14050 V 12000 H 9400 V 10500 H 9350 V 7700 H 9400 Z" />
         {renovated ? <g className="floor-renovation-features">
           <rect className="floor-renovation-storage" x={10600} y={3650} width={1000} height={950} />
-          <rect className="floor-renovation-storage" x={2300} y={4650} width={1300} height={850} />
-          <line x1={2950} y1={4650} x2={2950} y2={5500} />
           <rect className="floor-renovation-island" x={4950} y={3400} width={1500} height={850} rx={70} />
           <rect className="floor-renovation-dressing" data-space="dressing-room" x={0} y={7000} width={3600} height={1850} />
         </g> : null}
@@ -182,8 +180,8 @@ export function FloorPlanDrawing({ variant = "base" }: { variant?: FloorPlanVari
       </g>
 
       <g className="floor-doors">
-        <Door marker="room-1-exit" x={2700} y={4600} rotation={0} /><Door marker="room-2-entry" x={8700} y={4500} rotation={-90} /><Door x={2300} y={5400} rotation={90} size={700} /><Door marker="room-3-entry" x={2500} y={7000} rotation={0} /><Door x={7000} y={7550} rotation={90} />
-        <Door marker="bath-2-entry" x={bathTwo.x + bathTwo.width} y={5000} rotation={90} size={650} /><Door x={10100} y={5650} rotation={90} size={720} /><Door x={11600} y={6050} rotation={-90} size={760} /><Door marker="common-entry" x={10100} y={7000} rotation={0} size={760} />
+        <Door marker="room-1-exit" x={2700} y={4600} rotation={0} /><Door marker="room-2-entry" x={9460} y={4600} rotation={180} /><Door x={2300} y={5400} rotation={90} size={700} /><Door marker="room-3-entry" x={2500} y={7000} rotation={0} /><Door marker="room-4-entry" x={7400} y={7000} rotation={0} />
+        <Door marker="bath-2-entry" x={bathTwo.x + bathTwo.width} y={5000} rotation={90} size={650} /><Door marker="entry-door" x={11350} y={7000} rotation={180} size={760} />
       </g>
 
       <g className="floor-room-labels">
@@ -199,7 +197,7 @@ export function FloorPlanDrawing({ variant = "base" }: { variant?: FloorPlanVari
 
       {renovated ? <g className="floor-renovation-badges">
         <RenovationBadge x={11250} y={3900} number={1} label="현관 수납 확장" /><RenovationBadge x={8350} y={4550} number={2} label="욕실 내부 배치" /><RenovationBadge x={6200} y={3500} number={3} label="아일랜드" />
-        <RenovationBadge x={350} y={650} number={4} label="침실 확장" /><RenovationBadge x={3350} y={4850} number={5} label="수납 분리" /><RenovationBadge x={3350} y={7350} number={6} label="드레스룸" /><RenovationBadge x={6750} y={11950} number={7} label="거실 확장" />
+        <RenovationBadge x={350} y={650} number={4} label="침실 확장" /><RenovationBadge x={3350} y={4750} number={5} label="붙박이 제거 · 문" /><RenovationBadge x={3350} y={7350} number={6} label="드레스룸" /><RenovationBadge x={6750} y={11950} number={7} label="거실 확장" />
       </g> : null}
 
       <HorizontalDimension x1={0} x2={12000} y={-1050} label="세대 폭 12,000 mm" extensionTo={-80} />
