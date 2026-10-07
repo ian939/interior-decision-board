@@ -500,7 +500,7 @@ a { color: inherit; }
 .planner-canvas-scroll { height: 690px; padding: 15px; overflow: auto; position: relative; display: flex; align-items: flex-start; justify-content: center; background: #dfe3dd; scrollbar-width: thin; }
 .planner-canvas { height: auto; flex: none; display: block; filter: drop-shadow(0 12px 25px rgba(35,45,38,.14)); touch-action: none; user-select: none; }
 .floor-plan-vector, .planner-source-overlay { pointer-events: none; }
-.floor-plan-paper { fill: #fbfaf5; stroke: #33483a; stroke-width: 36; }
+.floor-plan-paper { fill: #fbfaf5; stroke: none; }
 .floor-zone { stroke: none; }
 .floor-zone.bedroom { fill: #f5edd5; }
 .floor-zone.kitchen { fill: #efc883; }
@@ -511,9 +511,10 @@ a { color: inherit; }
 .floor-zone.entry { fill: #e9dfcd; }
 .floor-zone.common { fill: #e8e8e4; }
 .floor-walls rect, .floor-walls path { fill: none; stroke: #344139; stroke-width: 150; stroke-linejoin: miter; }
-.floor-walls .common-wall { stroke: #778078; stroke-width: 90; stroke-dasharray: 150 85; }
+.floor-walls .common-wall { stroke: #5f6962; stroke-width: 110; stroke-dasharray: none; }
 .floor-fixtures { fill: rgba(255,255,255,.24); stroke: #667269; stroke-width: 52; }
 .floor-fixtures line { fill: none; }
+.floor-stair line, .floor-stair polyline { fill: none; stroke: #5f6962; stroke-width: 58; stroke-linecap: square; stroke-linejoin: miter; }
 .floor-window line { stroke: #9ab2b2; stroke-width: 68; stroke-linecap: round; }
 .floor-door-gap { stroke: #fbfaf5; stroke-width: 205; }
 .floor-door-leaf, .floor-door path { fill: none; stroke: #69776d; stroke-width: 45; }

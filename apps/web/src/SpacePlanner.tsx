@@ -8,7 +8,7 @@ import { FloorPlanDrawing } from "./FloorPlanDrawing";
 const PLAN_WIDTH = 12_000;
 const PLAN_HEIGHT = 12_550;
 const PLAN_IMAGE = `${import.meta.env.BASE_URL}project-assets/plans/floorplan-base.png`;
-const DRAWING_VIEWBOX = { x: -1_300, y: -1_400, width: 15_050, height: 15_150 } as const;
+const DRAWING_VIEWBOX = { x: -1_550, y: -1_400, width: 17_250, height: 15_150 } as const;
 
 type FurniturePreset = {
   label: string;
@@ -44,7 +44,7 @@ const roomGuides = [
   { id: "bath-1", label: "화장실 1", x: 300, y: 5_200, width: 1_900, depth: 1_850 },
   { id: "living", label: "거실", x: 3_650, y: 4_700, width: 2_800, depth: 6_300 },
   { id: "room-3", label: "방 3", x: 250, y: 7_050, width: 3_350, depth: 4_200 },
-  { id: "bath-2", label: "화장실 2", x: 6_650, y: 4_050, width: 1_950, depth: 1_650 },
+  { id: "bath-2", label: "화장실 2", x: 6_650, y: 4_350, width: 1_950, depth: 1_450 },
   { id: "room-4", label: "방 4", x: 7_050, y: 7_050, width: 2_300, depth: 3_350 },
   { id: "entry", label: "현관", x: 10_100, y: 5_050, width: 1_450, depth: 1_900 },
   { id: "balcony", label: "베란다", x: 1_250, y: 11_150, width: 6_900, depth: 1_300 },
@@ -342,7 +342,7 @@ export function SpacePlannerView(): ReactNode {
                   ref={svgRef}
                   className="planner-canvas"
                   viewBox={`${DRAWING_VIEWBOX.x} ${DRAWING_VIEWBOX.y} ${DRAWING_VIEWBOX.width} ${DRAWING_VIEWBOX.height}`}
-                  style={{ width: `${zoom * 100}%`, minWidth: `${620 * zoom}px` }}
+                  style={{ width: `${zoom * 100}%`, minWidth: `${720 * zoom}px` }}
                   onPointerMove={moveDrag}
                   onPointerUp={() => setDragging(null)}
                   onPointerCancel={() => setDragging(null)}
@@ -352,12 +352,13 @@ export function SpacePlannerView(): ReactNode {
                 >
                   <defs>
                     <clipPath id="plan-clip"><rect width={PLAN_WIDTH} height={PLAN_HEIGHT} /></clipPath>
+                    <clipPath id="source-clip"><rect width="14200" height={PLAN_HEIGHT} /></clipPath>
                     <pattern id="planner-small-grid" width="500" height="500" patternUnits="userSpaceOnUse"><path d="M 500 0 L 0 0 0 500" fill="none" stroke="#789081" strokeWidth="10" opacity=".22" /></pattern>
                     <pattern id="planner-large-grid" width="1000" height="1000" patternUnits="userSpaceOnUse"><rect width="1000" height="1000" fill="url(#planner-small-grid)" /><path d="M 1000 0 L 0 0 0 1000" fill="none" stroke="#526b59" strokeWidth="16" opacity=".24" /></pattern>
                   </defs>
                   <FloorPlanDrawing />
+                  {showSource ? <g clipPath="url(#source-clip)"><g className="planner-source-overlay" transform={`translate(${PLAN_WIDTH} 0) scale(-1 1)`}><image href={PLAN_IMAGE} x="-5353" y="-1930" width="20710" height="16191" preserveAspectRatio="none" /></g></g> : null}
                   <g clipPath="url(#plan-clip)">
-                    {showSource ? <g className="planner-source-overlay" transform={`translate(${PLAN_WIDTH} 0) scale(-1 1)`}><image href={PLAN_IMAGE} x="-5353" y="-1930" width="20710" height="16191" preserveAspectRatio="none" /></g> : null}
                     {showGrid ? <rect width={PLAN_WIDTH} height={PLAN_HEIGHT} fill="url(#planner-large-grid)" /> : null}
                     {showGuides ? roomGuides.map((zone) => <g className="planner-room-guide" key={zone.id}><rect x={zone.x} y={zone.y} width={zone.width} height={zone.depth} rx="70" /><text x={zone.x + 100} y={zone.y + 260}>{zone.label} · 근사</text></g>) : null}
                     {items.map((item) => {
