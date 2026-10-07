@@ -60,6 +60,11 @@ try {
   else await page.getByRole("button", { name: /새 배치안/ }).click();
   const layoutName = page.getByLabel("배치안 이름");
   await layoutName.waitFor();
+  await page.locator(".floor-plan-vector").waitFor();
+  if (await page.locator(".floor-dimension").count() < 10) throw new Error("도면 외곽 치수선이 충분히 표시되지 않았습니다.");
+  await page.getByRole("button", { name: "원본 대조" }).click();
+  await page.locator(".planner-source-overlay").waitFor();
+  await page.getByRole("button", { name: "원본 대조" }).click();
   await layoutName.fill("E2E 배치안");
   await page.getByRole("button", { name: /3인 소파/ }).click();
   await page.getByRole("button", { name: /식탁 4인/ }).click();
@@ -98,7 +103,7 @@ try {
     JSON.stringify(
       {
         ok: true,
-        assertions: ["login", "desktop_board", "card_drawer", "card_delete_confirmation", "mobile_board", "reference_plans", "reference_plan_orientation", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
+        assertions: ["login", "desktop_board", "card_drawer", "card_delete_confirmation", "mobile_board", "reference_plans", "reference_plan_orientation", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_vector_plan", "space_planner_dimensions", "space_planner_source_overlay", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
         outputDir,
       },
       null,

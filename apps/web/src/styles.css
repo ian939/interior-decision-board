@@ -485,6 +485,35 @@ a { color: inherit; }
 .planner-canvas-toolbar select { height: 24px; border: 0; border-radius: 6px; background: #eceae4; color: var(--ink); font-size: 8px; }
 .planner-canvas-scroll { height: 690px; padding: 15px; overflow: auto; position: relative; display: flex; align-items: flex-start; justify-content: center; background: #dfe3dd; scrollbar-width: thin; }
 .planner-canvas { height: auto; flex: none; display: block; filter: drop-shadow(0 12px 25px rgba(35,45,38,.14)); touch-action: none; user-select: none; }
+.floor-plan-vector, .planner-source-overlay { pointer-events: none; }
+.floor-plan-paper { fill: #fbfaf5; stroke: #33483a; stroke-width: 36; }
+.floor-zone { stroke: none; }
+.floor-zone.bedroom { fill: #f5edd5; }
+.floor-zone.kitchen { fill: #efc883; }
+.floor-zone.living { fill: #f2bd6c; }
+.floor-zone.bath { fill: #dcebef; }
+.floor-zone.balcony { fill: #edf0e8; }
+.floor-zone.service { fill: #f3f0e7; }
+.floor-zone.entry { fill: #e9dfcd; }
+.floor-zone.common { fill: #e8e8e4; }
+.floor-walls rect, .floor-walls path { fill: none; stroke: #344139; stroke-width: 150; stroke-linejoin: miter; }
+.floor-walls .common-wall { stroke: #778078; stroke-width: 90; stroke-dasharray: 150 85; }
+.floor-fixtures { fill: rgba(255,255,255,.24); stroke: #667269; stroke-width: 52; }
+.floor-fixtures line { fill: none; }
+.floor-window line { stroke: #9ab2b2; stroke-width: 68; stroke-linecap: round; }
+.floor-door-gap { stroke: #fbfaf5; stroke-width: 205; }
+.floor-door-leaf, .floor-door path { fill: none; stroke: #69776d; stroke-width: 45; }
+.floor-door path { stroke-dasharray: 55 28; opacity: .8; }
+.floor-room-label { text-anchor: middle; pointer-events: none; }
+.floor-room-name { fill: #28382e; font-size: 260px; font-weight: 800; paint-order: stroke; stroke: rgba(255,255,255,.86); stroke-width: 36px; }
+.floor-room-note { fill: #647168; font-size: 145px; font-weight: 650; paint-order: stroke; stroke: rgba(255,255,255,.8); stroke-width: 25px; }
+.floor-room-label.compact .floor-room-name { font-size: 205px; }
+.floor-room-label.compact .floor-room-note { font-size: 120px; }
+.floor-dimension line { stroke: #52635a; stroke-width: 28; }
+.floor-dimension .extension { stroke-width: 18; stroke-dasharray: 50 35; opacity: .52; }
+.floor-dimension text { fill: #34483b; font-size: 180px; font-weight: 750; text-anchor: middle; paint-order: stroke; stroke: white; stroke-width: 22px; }
+.floor-dimension-label-bg { fill: rgba(255,255,255,.88); stroke: rgba(83,101,91,.3); stroke-width: 12; }
+.planner-source-overlay { opacity: .3; mix-blend-mode: multiply; }
 .planner-room-guide rect { fill: rgba(89,113,96,.09); stroke: #57705e; stroke-width: 20; stroke-dasharray: 65 40; }
 .planner-room-guide text { fill: #4d6654; font-size: 190px; font-weight: 700; paint-order: stroke; stroke: rgba(255,255,255,.9); stroke-width: 28px; }
 .planner-item { cursor: grab; outline: none; }
