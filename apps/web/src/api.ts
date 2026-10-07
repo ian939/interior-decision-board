@@ -85,6 +85,12 @@ export const api = {
     request<CardDetail>(`/cards/${id}/transition`, { method: "POST", body: JSON.stringify(input) }),
   comment: (id: string, body: string) =>
     request(`/cards/${id}/comments`, { method: "POST", body: JSON.stringify({ body }) }),
+  commentWithImage: (id: string, body: string, image: File) => {
+    const form = new FormData();
+    form.append("body", body);
+    form.append("image", image);
+    return request(`/cards/${id}/comments/image`, { method: "POST", body: form });
+  },
   preference: (id: string, value: PreferenceValue | null) =>
     request(`/cards/${id}/preference`, { method: "PUT", body: JSON.stringify({ value }) }),
   addRelatedUrl: (id: string, url: string) =>

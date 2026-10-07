@@ -103,6 +103,12 @@ export function initializeDatabase(appConfig: AppConfig): DatabaseSync {
       updated_at TEXT NOT NULL
     ) STRICT;
 
+    CREATE TABLE IF NOT EXISTS comment_attachments (
+      comment_id TEXT NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
+      attachment_id TEXT NOT NULL REFERENCES attachments(id) ON DELETE CASCADE,
+      PRIMARY KEY (comment_id, attachment_id)
+    ) STRICT;
+
     CREATE TABLE IF NOT EXISTS preferences (
       card_id TEXT NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
       user_id TEXT NOT NULL REFERENCES users(id),
@@ -194,6 +200,7 @@ export function initializeDatabase(appConfig: AppConfig): DatabaseSync {
 
     CREATE INDEX IF NOT EXISTS idx_cards_status_updated ON cards(status, updated_at DESC);
     CREATE INDEX IF NOT EXISTS idx_comments_card_created ON comments(card_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_comment_attachments_comment ON comment_attachments(comment_id);
     CREATE INDEX IF NOT EXISTS idx_related_card_created ON related_sources(card_id, created_at);
     CREATE INDEX IF NOT EXISTS idx_activity_card_created ON activity_logs(card_id, created_at DESC);
     CREATE INDEX IF NOT EXISTS idx_jobs_status_run_after ON jobs(status, run_after);

@@ -23,6 +23,8 @@ try {
   if (await card.count()) {
     await card.click();
     await page.locator(".card-drawer").waitFor();
+    const conversation = page.locator(".detail-section").filter({ has: page.getByRole("heading", { name: /우리의 이야기/ }) });
+    await conversation.getByRole("button", { name: "이미지 첨부" }).waitFor();
     await page.waitForTimeout(250);
     await page.screenshot({ path: resolve(outputDir, "03-card-drawer.png"), fullPage: true });
     await page.getByRole("button", { name: "자료 삭제" }).click();
@@ -103,7 +105,7 @@ try {
     JSON.stringify(
       {
         ok: true,
-        assertions: ["login", "desktop_board", "card_drawer", "card_delete_confirmation", "mobile_board", "reference_plans", "reference_plan_orientation", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_vector_plan", "space_planner_dimensions", "space_planner_source_overlay", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
+        assertions: ["login", "desktop_board", "card_drawer", "story_image_picker", "card_delete_confirmation", "mobile_board", "reference_plans", "reference_plan_orientation", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_vector_plan", "space_planner_dimensions", "space_planner_source_overlay", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
         outputDir,
       },
       null,

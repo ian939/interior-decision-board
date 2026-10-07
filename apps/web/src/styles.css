@@ -308,8 +308,22 @@ a { color: inherit; }
 .comment header strong { font-size: 10px; }
 .comment time, .timeline time { font-size: 8px; color: #9ba09b; }
 .comment p { margin: 4px 0 0; font-size: 10.5px; line-height: 1.65; color: var(--ink-soft); white-space: pre-line; }
-.comment-form { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 7px; margin-top: 15px; }
-.comment-form .primary-button { height: 43px; min-height: 43px; }
+.comment-images { margin-top: 8px; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; }
+.comment-images a { aspect-ratio: 4/3; border: 1px solid var(--line-light); border-radius: 9px; background: #eeece6; overflow: hidden; display: block; }
+.comment-images img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .18s ease; }
+.comment-images a:hover img { transform: scale(1.025); }
+.comment-form { display: flex; flex-direction: column; gap: 7px; margin-top: 15px; }
+.comment-compose-row { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: end; gap: 7px; }
+.comment-compose-row .primary-button { height: 43px; min-height: 43px; }
+.comment-image-button { width: 48px; height: 43px; padding: 0; border: 1px solid var(--line); border-radius: 9px; background: white; color: var(--ink-soft); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1px; cursor: pointer; }
+.comment-image-button span { font-size: 7px; }
+.comment-image-button:hover, .comment-image-button.selected { border-color: #9eaf9f; background: var(--sage-pale); color: var(--sage-deep); }
+.comment-upload-preview { min-height: 69px; padding: 7px; border: 1px solid #bdcbbb; border-radius: 10px; background: var(--sage-pale); display: grid; grid-template-columns: 58px minmax(0,1fr) auto; gap: 9px; align-items: center; }
+.comment-upload-preview img { width: 58px; height: 54px; border-radius: 7px; object-fit: cover; background: #e7e8e2; }
+.comment-upload-preview > div { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.comment-upload-preview strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 9px; }
+.comment-upload-preview span { color: var(--ink-soft); font-size: 8px; line-height: 1.4; }
+.comment-upload-hint { color: #9a9f9a; font-size: 7px; padding-left: 56px; }
 .activity-section { padding-bottom: 40px; }
 .timeline { padding-left: 4px; }
 .timeline-item { position: relative; display: grid; grid-template-columns: 13px 1fr; gap: 8px; padding-bottom: 14px; }

@@ -80,6 +80,30 @@ describe("decision workflow", () => {
     expect(detail.preferences[partner.id]).toBe("hold");
   });
 
+  it("stores an image with a shared conversation comment", () => {
+    const owner = store.getUserByRole("owner")!;
+    const card = store.createCard({
+      title: "이미지 의견",
+      sourceType: "image",
+      sourceChannel: "web",
+      createdBy: owner.id,
+      aiStatus: "manual",
+    });
+    const comment = store.addImageComment(card.id, owner.id, "이 색감이 좋아요", {
+      originalName: "living-room.jpg",
+      storedName: "stored-living-room.jpg",
+      mimeType: "image/jpeg",
+      size: 456,
+      checksum: "image-checksum",
+    });
+
+    expect(comment.body).toBe("이 색감이 좋아요");
+    expect(comment.images).toHaveLength(1);
+    expect(comment.images[0]?.originalName).toBe("living-room.jpg");
+    expect(store.getCard(card.id)?.comments[0]?.images[0]?.url).toMatch(/^\/api\/files\//);
+    expect(store.deleteCard(card.id)).toEqual({ deleted: true, storedNames: ["stored-living-room.jpg"] });
+  });
+
   it("recovers a job interrupted by a server restart", () => {
     const owner = store.getUserByRole("owner")!;
     store.createCard({

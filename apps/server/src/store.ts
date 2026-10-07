@@ -67,6 +67,8 @@ export interface CreateAttachmentInput {
   kind: "source" | "thumbnail" | "supplement";
 }
 
+type StoredImageInput = Omit<CreateAttachmentInput, "cardId" | "kind">;
+
 export interface ClaimedJob {
   id: string;
   type: "analyze_card" | "analyze_related" | "compare" | "draft_work_request";
@@ -400,6 +402,32 @@ export class Store {
     return this.listComments(cardId).find((comment) => comment.id === id) as Comment;
   }
 
+  addImageComment(cardId: string, userId: string, body: string, image: StoredImageInput): Comment {
+    if (!this.cardExists(cardId)) throw new Error("CARD_NOT_FOUND");
+    const commentId = createId();
+    const attachmentId = createId();
+    const timestamp = now();
+    this.db.exec("BEGIN");
+    try {
+      this.db
+        .prepare(
+          `INSERT INTO attachments (id, card_id, original_name, stored_name, mime_type, size, checksum, kind, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, 'supplement', ?)`,
+        )
+        .run(attachmentId, cardId, image.originalName, image.storedName, image.mimeType, image.size, image.checksum, timestamp);
+      this.db
+        .prepare("INSERT INTO comments (id, card_id, user_id, body, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)")
+        .run(commentId, cardId, userId, body.trim(), timestamp, timestamp);
+      this.db.prepare("INSERT INTO comment_attachments (comment_id, attachment_id) VALUES (?, ?)").run(commentId, attachmentId);
+      this.addActivity(cardId, userId, "comment_added", body.trim() ? "이미지와 의견" : "이미지");
+      this.db.exec("COMMIT");
+    } catch (error) {
+      this.db.exec("ROLLBACK");
+      throw error;
+    }
+    return this.listComments(cardId).find((comment) => comment.id === commentId) as Comment;
+  }
+
   setPreference(cardId: string, userId: string, value: PreferenceValue | null): void {
     if (!this.cardExists(cardId)) throw new Error("CARD_NOT_FOUND");
     if (value === null) {
@@ -701,10 +729,22 @@ export class Store {
     return rows.map((row) => ({
       id: text(row.id),
       body: text(row.body),
+      images: this.imagesForComment(text(row.id)),
       author: { id: text(row.user_id_value), name: text(row.user_name), role: text(row.user_role) as "owner" | "partner" },
       createdAt: text(row.created_at),
       updatedAt: text(row.updated_at),
     }));
+  }
+
+  private imagesForComment(commentId: string): Attachment[] {
+    const rows = this.db
+      .prepare(
+        `SELECT a.* FROM attachments a
+         JOIN comment_attachments ca ON ca.attachment_id = a.id
+         WHERE ca.comment_id = ? ORDER BY a.created_at`,
+      )
+      .all(commentId) as DbRow[];
+    return rows.map((row) => this.attachmentFromRow(row));
   }
 
   private listActivities(cardId: string): ActivityLog[] {

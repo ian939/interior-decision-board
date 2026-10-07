@@ -87,6 +87,7 @@ export interface Attachment {
 export interface Comment {
   id: string;
   body: string;
+  images: Attachment[];
   author: UserSummary;
   createdAt: string;
   updatedAt: string;

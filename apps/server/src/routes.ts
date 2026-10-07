@@ -21,6 +21,7 @@ const updateCardSchema = z.object({
   spaceIds: z.array(z.string()).max(20).optional(),
 });
 const commentSchema = z.object({ body: z.string().trim().min(1).max(3000) });
+const imageCommentBodySchema = z.string().trim().max(3000);
 const preferenceInputSchema = z.object({ value: preferenceSchema.nullable() });
 const relatedUrlSchema = z.object({ url: z.url() });
 const workRequestUpdateSchema = z.object({
@@ -209,6 +210,34 @@ export function registerRoutes(
     try {
       return reply.code(201).send(store.addComment(request.params.id, user.id, parsed.data.body));
     } catch (error) {
+      return errorReply(reply, error);
+    }
+  });
+
+  app.post<{ Params: { id: string } }>("/api/cards/:id/comments/image", async (request, reply) => {
+    const user = requireUser(request, reply, store, appConfig);
+    if (!user) return;
+    if (!store.getCard(request.params.id)) return reply.code(404).send({ error: "카드를 찾을 수 없습니다." });
+    let body = "";
+    let saved: Awaited<ReturnType<typeof saveMultipartFile>> | null = null;
+    try {
+      for await (const part of request.parts()) {
+        if (part.type === "field") {
+          if (part.fieldname === "body") body = String(part.value ?? "");
+          continue;
+        }
+        if (!part.mimetype.startsWith("image/")) throw new Error("UNSUPPORTED_FILE_TYPE");
+        saved = await saveMultipartFile(part, appConfig);
+      }
+      if (!saved) return reply.code(400).send({ error: "이미지를 선택하세요." });
+      const parsed = imageCommentBodySchema.safeParse(body);
+      if (!parsed.success) {
+        await removeStoredFiles([saved.storedName], appConfig);
+        return reply.code(400).send({ error: "의견은 3,000자 이내로 입력하세요." });
+      }
+      return reply.code(201).send(store.addImageComment(request.params.id, user.id, parsed.data, saved));
+    } catch (error) {
+      if (saved) await removeStoredFiles([saved.storedName], appConfig);
       return errorReply(reply, error);
     }
   });

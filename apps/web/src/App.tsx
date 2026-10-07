@@ -596,8 +596,49 @@ function RelatedPanel({ card, onChanged, onError }: { card: CardDetail; onChange
 
 function CommentsPanel({ card, onChanged, onError }: { card: CardDetail; onChanged: () => Promise<void>; onError: (error: string) => void }): ReactNode {
   const [body, setBody] = useState("");
-  const mutation = useMutation({ mutationFn: () => api.comment(card.id, body), onSuccess: async () => { setBody(""); await onChanged(); }, onError: (error) => onError(readableError(error)) });
-  return <section className="detail-section"><div className="section-heading"><div><span className="section-kicker">CONVERSATION</span><h3>우리의 이야기 <small>{card.comments.length}</small></h3></div></div><div className="comment-list">{card.comments.map((comment) => <article className="comment" key={comment.id}><span className={`person-avatar small ${comment.author.role === "owner" ? "avatar-one" : "avatar-two"}`}>{comment.author.name.slice(0, 1)}</span><div><header><strong>{comment.author.name}</strong><time>{dateTime(comment.createdAt)}</time></header><p>{comment.body}</p></div></article>)}{card.comments.length === 0 ? <p className="empty-inline">첫 의견을 남겨보세요.</p> : null}</div><form className="comment-form" onSubmit={(event) => { event.preventDefault(); if (body.trim()) mutation.mutate(); }}><textarea className="text-area" rows={2} value={body} onChange={(event) => setBody(event.target.value)} placeholder="이 자료에 대한 생각을 남겨주세요." /><button className="primary-button" type="submit" disabled={!body.trim() || mutation.isPending}>등록</button></form></section>;
+  const [image, setImage] = useState<File | null>(null);
+  const imageRef = useRef<HTMLInputElement>(null);
+  const previewUrl = useMemo(() => image ? URL.createObjectURL(image) : null, [image]);
+  useEffect(() => () => { if (previewUrl) URL.revokeObjectURL(previewUrl); }, [previewUrl]);
+  const mutation = useMutation({
+    mutationFn: () => image ? api.commentWithImage(card.id, body, image) : api.comment(card.id, body),
+    onSuccess: async () => {
+      setBody("");
+      setImage(null);
+      await onChanged();
+    },
+    onError: (error) => onError(readableError(error)),
+  });
+  const submitReady = Boolean(body.trim() || image);
+  return (
+    <section className="detail-section">
+      <div className="section-heading"><div><span className="section-kicker">CONVERSATION</span><h3>우리의 이야기 <small>{card.comments.length}</small></h3></div></div>
+      <div className="comment-list">
+        {card.comments.map((comment) => {
+          const images = comment.images ?? [];
+          return <article className="comment" key={comment.id}>
+            <span className={`person-avatar small ${comment.author.role === "owner" ? "avatar-one" : "avatar-two"}`}>{comment.author.name.slice(0, 1)}</span>
+            <div>
+              <header><strong>{comment.author.name}</strong><time>{dateTime(comment.createdAt)}</time></header>
+              {comment.body ? <p>{comment.body}</p> : null}
+              {images.length ? <div className="comment-images">{images.map((item) => <a key={item.id} href={mediaUrl(item.url) ?? undefined} target="_blank" rel="noreferrer" title={item.originalName}><img src={mediaUrl(item.url) ?? undefined} alt={`${comment.author.name}님이 등록한 이미지`} /></a>)}</div> : null}
+            </div>
+          </article>;
+        })}
+        {card.comments.length === 0 ? <p className="empty-inline">첫 의견이나 이미지를 남겨보세요.</p> : null}
+      </div>
+      <form className="comment-form" onSubmit={(event) => { event.preventDefault(); if (submitReady) mutation.mutate(); }}>
+        {previewUrl && image ? <div className="comment-upload-preview"><img src={previewUrl} alt="등록 전 이미지 미리보기" /><div><strong>{image.name}</strong><span>{formatFileSize(image.size)} · 의견 없이 사진만 등록할 수도 있어요.</span></div><button className="icon-button" type="button" onClick={() => setImage(null)} aria-label="선택한 이미지 제거"><X size={16} /></button></div> : null}
+        <div className="comment-compose-row">
+          <input ref={imageRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) { if (!file.type.startsWith("image/")) onError("이미지 파일만 등록할 수 있습니다."); else setImage(file); } event.currentTarget.value = ""; }} />
+          <button className={`comment-image-button ${image ? "selected" : ""}`} type="button" onClick={() => imageRef.current?.click()} aria-label="이미지 첨부"><ImageIcon size={19} /><span>{image ? "변경" : "사진"}</span></button>
+          <textarea className="text-area" rows={2} value={body} onChange={(event) => setBody(event.target.value)} placeholder="생각을 적거나 사진만 올려도 됩니다." />
+          <button className="primary-button" type="submit" disabled={!submitReady || mutation.isPending}>{mutation.isPending ? <LoaderCircle className="spin" size={16} /> : null}등록</button>
+        </div>
+        <small className="comment-upload-hint">JPG · PNG · WebP · GIF, 최대 20MB</small>
+      </form>
+    </section>
+  );
 }
 
 function ActivityPanel({ card }: { card: CardDetail }): ReactNode {
