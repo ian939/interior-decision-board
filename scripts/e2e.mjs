@@ -63,9 +63,17 @@ try {
   const layoutName = page.getByLabel("배치안 이름");
   await layoutName.waitFor();
   await page.locator(".floor-plan-vector").waitFor();
+  const baseWallBounds = await page.locator(".floor-walls rect").first().evaluate((element) => (element).getBBox());
+  if (baseWallBounds.width <= 0 || baseWallBounds.height <= 0) throw new Error("기본도면 벽이 정상 렌더링되지 않습니다.");
   const commonAreaBounds = await page.locator(".floor-common-area").evaluate((element) => (element).getBBox());
   if (commonAreaBounds.x + commonAreaBounds.width <= 12_000) throw new Error("공용 홀·승강기·계단이 세대 폭 12,000mm 밖에 표시되지 않습니다.");
   if (await page.locator(".floor-dimension").count() < 10) throw new Error("도면 외곽 치수선이 충분히 표시되지 않았습니다.");
+  await page.getByRole("button", { name: /요청 반영안/ }).click();
+  await page.locator('[data-plan-variant="renovation"]').waitFor();
+  if (await page.locator(".floor-renovation-badge").count() !== 7) throw new Error("요청 반영안 7개 항목이 모두 표시되지 않습니다.");
+  await page.screenshot({ path: resolve(outputDir, "09b-space-planner-renovation.png"), fullPage: true });
+  await page.getByRole("button", { name: "기본도면", exact: true }).click();
+  await page.locator('[data-plan-variant="base"]').waitFor();
   await page.getByRole("button", { name: "원본 대조" }).click();
   await page.locator(".planner-source-overlay").waitFor();
   await page.screenshot({ path: resolve(outputDir, "09a-space-planner-source-overlay.png"), fullPage: true });
@@ -108,7 +116,7 @@ try {
     JSON.stringify(
       {
         ok: true,
-        assertions: ["login", "desktop_board", "card_drawer", "story_image_picker", "card_delete_confirmation", "mobile_board", "reference_plans", "reference_plan_orientation", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_vector_plan", "space_planner_common_area_outside_unit", "space_planner_dimensions", "space_planner_source_overlay", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
+        assertions: ["login", "desktop_board", "card_drawer", "story_image_picker", "card_delete_confirmation", "mobile_board", "reference_plans", "reference_plan_orientation", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_vector_plan", "space_planner_wall_render", "space_planner_common_area_outside_unit", "space_planner_dimensions", "space_planner_renovation_variant", "space_planner_source_overlay", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
         outputDir,
       },
       null,
