@@ -519,6 +519,12 @@ a { color: inherit; }
 .planner-field > div { height: 36px; border: 1px solid var(--line); border-radius: 9px; background: white; display: grid; grid-template-columns: 1fr auto; align-items: center; overflow: hidden; }
 .planner-field input[type="number"] { min-width: 0; height: 100%; padding: 0 7px; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 9px; font-weight: 650; }
 .planner-field > div small { padding-right: 7px; color: #969c97; font-size: 7px; }
+.planner-color-control { grid-template-columns: 34px 1fr !important; gap: 8px; padding: 0 8px; }
+.planner-color-control input[type="color"] { width: 30px; height: 26px; padding: 0; border: 0; border-radius: 7px; background: transparent; cursor: pointer; }
+.planner-color-control input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+.planner-color-control input[type="color"]::-webkit-color-swatch { border: 1px solid rgba(31,48,38,.22); border-radius: 6px; }
+.planner-color-control input[type="color"]::-moz-color-swatch { border: 1px solid rgba(31,48,38,.22); border-radius: 6px; }
+.planner-color-control strong { color: var(--ink); font-size: 9px; letter-spacing: .04em; }
 .planner-dimension-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
 .planner-selected-summary { margin-top: 15px; border: 1px solid var(--line-light); border-radius: 10px; overflow: hidden; background: #f7f6f1; }
 .planner-selected-summary > div { min-height: 42px; padding: 8px 10px; display: flex; flex-direction: column; gap: 3px; }

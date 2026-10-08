@@ -77,6 +77,62 @@ function cloneItems(items: PlannerItem[]): PlannerItem[] {
   return items.map((item) => ({ ...item, id: crypto.randomUUID() }));
 }
 
+function PlannerNumberInput({
+  ariaLabel,
+  value,
+  min,
+  max,
+  step,
+  onChange,
+}: {
+  ariaLabel: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  onChange: (value: number) => void;
+}): ReactNode {
+  const [draft, setDraft] = useState(String(Math.round(value)));
+  const [editing, setEditing] = useState(false);
+
+  useEffect(() => {
+    if (!editing) setDraft(String(Math.round(value)));
+  }, [editing, value]);
+
+  function commit(): void {
+    const parsed = Number(draft);
+    if (!draft.trim() || !Number.isFinite(parsed)) {
+      setDraft(String(Math.round(value)));
+      setEditing(false);
+      return;
+    }
+    const next = Math.round(clamp(parsed, min, max));
+    onChange(next);
+    setDraft(String(next));
+    setEditing(false);
+  }
+
+  return (
+    <input
+      aria-label={ariaLabel}
+      type="number"
+      value={draft}
+      min={min}
+      max={max}
+      step={step}
+      onFocus={() => setEditing(true)}
+      onChange={(event) => {
+        const nextDraft = event.target.value;
+        setDraft(nextDraft);
+        const parsed = Number(nextDraft);
+        if (nextDraft.trim() && Number.isFinite(parsed) && parsed >= min && parsed <= max) onChange(Math.round(parsed));
+      }}
+      onBlur={commit}
+      onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur(); }}
+    />
+  );
+}
+
 export function SpacePlannerView(): ReactNode {
   const queryClient = useQueryClient();
   const layoutsQuery = useQuery({ queryKey: ["planner-layouts"], queryFn: api.plannerLayouts, refetchOnWindowFocus: false });
@@ -122,7 +178,7 @@ export function SpacePlannerView(): ReactNode {
   const saveLayout = useMutation({
     mutationFn: () => {
       if (!activeId) throw new Error("저장할 배치안이 없습니다.");
-      return api.updatePlannerLayout(activeId, { name, items });
+      return api.updatePlannerLayout(activeId, { name, items: items.map((item) => ({ ...item, label: item.label.trim() || "가구" })) });
     },
     onSuccess: (layout) => { updateCache(layout); hydrate(layout); },
     onError: (mutationError) => setError(readableError(mutationError)),
@@ -379,10 +435,11 @@ export function SpacePlannerView(): ReactNode {
             <aside className="planner-inspector">
               <div className="planner-panel-heading"><div><span>INSPECTOR</span><h2>치수와 배치</h2></div></div>
               {selected ? <>
-                <label className="planner-field"><span>이름</span><input className="text-input" value={selected.label} onChange={(event) => updateSelected({ label: event.target.value.slice(0, 80) || "가구" })} /></label>
-                <div className="planner-dimension-grid"><label className="planner-field"><span>가로 W</span><div><input type="number" value={selected.widthMm} min="100" max="12000" step="50" onChange={(event) => updateSelected({ widthMm: clamp(Number(event.target.value), 100, PLAN_WIDTH) })} /><small>mm</small></div></label><label className="planner-field"><span>세로 D</span><div><input type="number" value={selected.depthMm} min="100" max="12550" step="50" onChange={(event) => updateSelected({ depthMm: clamp(Number(event.target.value), 100, PLAN_HEIGHT) })} /><small>mm</small></div></label></div>
-                <div className="planner-dimension-grid"><label className="planner-field"><span>X 위치</span><div><input type="number" value={Math.round(selected.xMm)} min="0" max="12000" step={snapMm} onChange={(event) => updateSelected({ xMm: Number(event.target.value) })} /><small>mm</small></div></label><label className="planner-field"><span>Y 위치</span><div><input type="number" value={Math.round(selected.yMm)} min="0" max="12550" step={snapMm} onChange={(event) => updateSelected({ yMm: Number(event.target.value) })} /><small>mm</small></div></label></div>
-                <label className="planner-field"><span>사방 통로 여유</span><div><input type="number" value={selected.clearanceMm} min="0" max="3000" step="100" onChange={(event) => updateSelected({ clearanceMm: clamp(Number(event.target.value), 0, 3_000) })} /><small>mm</small></div></label>
+                <label className="planner-field"><span>이름</span><input aria-label="가구 이름" className="text-input" value={selected.label} onChange={(event) => updateSelected({ label: event.target.value.slice(0, 80) })} onBlur={(event) => updateSelected({ label: event.currentTarget.value.trim() || "가구" })} /></label>
+                <div className="planner-dimension-grid"><label className="planner-field"><span>가로 W</span><div><PlannerNumberInput key={`${selected.id}-width`} ariaLabel="가구 가로" value={selected.widthMm} min={100} max={PLAN_WIDTH} step={50} onChange={(value) => updateSelected({ widthMm: value })} /><small>mm</small></div></label><label className="planner-field"><span>세로 D</span><div><PlannerNumberInput key={`${selected.id}-depth`} ariaLabel="가구 세로" value={selected.depthMm} min={100} max={PLAN_HEIGHT} step={50} onChange={(value) => updateSelected({ depthMm: value })} /><small>mm</small></div></label></div>
+                <div className="planner-dimension-grid"><label className="planner-field"><span>X 위치</span><div><PlannerNumberInput key={`${selected.id}-x`} ariaLabel="가구 X 위치" value={selected.xMm} min={0} max={PLAN_WIDTH} step={snapMm} onChange={(value) => updateSelected({ xMm: value })} /><small>mm</small></div></label><label className="planner-field"><span>Y 위치</span><div><PlannerNumberInput key={`${selected.id}-y`} ariaLabel="가구 Y 위치" value={selected.yMm} min={0} max={PLAN_HEIGHT} step={snapMm} onChange={(value) => updateSelected({ yMm: value })} /><small>mm</small></div></label></div>
+                <label className="planner-field"><span>사방 통로 여유</span><div><PlannerNumberInput key={`${selected.id}-clearance`} ariaLabel="사방 통로 여유" value={selected.clearanceMm} min={0} max={3_000} step={100} onChange={(value) => updateSelected({ clearanceMm: value })} /><small>mm</small></div></label>
+                <label className="planner-field planner-color-field"><span>색상</span><div className="planner-color-control"><input aria-label="가구 색상" type="color" value={selected.color} onChange={(event) => updateSelected({ color: event.target.value })} /><strong>{selected.color.toUpperCase()}</strong></div></label>
                 <div className="planner-selected-summary"><div><span>현재 차지 크기</span><strong>{formatDimension(footprint(selected).width)} × {formatDimension(footprint(selected).depth)}</strong></div><div><span>예상 공간</span><strong>{selectedZone?.label ?? "가이드 밖"}</strong></div></div>
                 {selectedIssues.length ? <div className="planner-issues">{selectedIssues.map((issue) => <div key={issue}><CircleAlert size={15} /><span>{issue}</span></div>)}</div> : <div className="planner-fit"><Check size={16} /><span>현재 배치에서 겹침이 발견되지 않았습니다.</span></div>}
                 <div className="planner-item-actions"><button className="secondary-button" onClick={() => updateSelected({ rotation: selected.rotation === 0 ? 90 : 0 })}><RotateCw size={16} />90° 회전</button><button className="secondary-button" onClick={duplicateSelected}><Copy size={16} />복사</button><button className="text-button danger-text" onClick={removeSelected}><Trash2 size={15} />가구 삭제</button></div>

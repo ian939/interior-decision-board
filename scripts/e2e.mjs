@@ -83,6 +83,23 @@ try {
   await page.getByRole("button", { name: /3인 소파/ }).click();
   await page.getByRole("button", { name: /식탁 4인/ }).click();
   await page.getByRole("heading", { name: "치수와 배치" }).waitFor();
+  const furnitureName = page.getByLabel("가구 이름");
+  await furnitureName.fill("");
+  if (await furnitureName.inputValue() !== "") throw new Error("가구 이름을 완전히 지울 수 없습니다.");
+  await furnitureName.fill("테스트 테이블");
+  const furnitureWidth = page.getByLabel("가구 가로");
+  await furnitureWidth.fill("");
+  if (await furnitureWidth.inputValue() !== "") throw new Error("가구 가로 값을 완전히 지울 수 없습니다.");
+  await furnitureWidth.fill("1350");
+  await furnitureWidth.blur();
+  const furnitureDepth = page.getByLabel("가구 세로");
+  await furnitureDepth.fill("");
+  if (await furnitureDepth.inputValue() !== "") throw new Error("가구 세로 값을 완전히 지울 수 없습니다.");
+  await furnitureDepth.fill("780");
+  await furnitureDepth.blur();
+  const furnitureColor = page.getByLabel("가구 색상");
+  await furnitureColor.fill("#4f7b68");
+  if (await furnitureColor.inputValue() !== "#4f7b68") throw new Error("가구 색상이 변경되지 않았습니다.");
   await page.locator(".planner-item.colliding").first().waitFor();
   if (await page.locator(".planner-item.colliding").count() < 2) throw new Error("겹침 표시가 두 가구에 적용되지 않았습니다.");
   await page.locator(".planner-clearance").waitFor();
@@ -117,7 +134,7 @@ try {
     JSON.stringify(
       {
         ok: true,
-        assertions: ["login", "desktop_board", "card_drawer", "story_image_picker", "card_delete_confirmation", "mobile_board", "reference_plan_grid_order", "reference_plan_grid_preview", "reference_construction_points", "living_fit_removed", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_renovation_plan_1", "space_planner_single_plan", "space_planner_change_variant_removed", "space_planner_homecafe_removed", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
+        assertions: ["login", "desktop_board", "card_drawer", "story_image_picker", "card_delete_confirmation", "mobile_board", "reference_plan_grid_order", "reference_plan_grid_preview", "reference_construction_points", "living_fit_removed", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_renovation_plan_1", "space_planner_single_plan", "space_planner_change_variant_removed", "space_planner_homecafe_removed", "space_planner_edit", "space_planner_clearable_inputs", "space_planner_color", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
         outputDir,
       },
       null,
