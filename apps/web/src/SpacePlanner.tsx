@@ -213,6 +213,19 @@ export function SpacePlannerView(): ReactNode {
     setDirty(true);
   }
 
+  function addHomeCafeSet(): void {
+    if (!activeId) return;
+    const nextItems: PlannerItem[] = [
+      { id: crypto.randomUUID(), label: "TV 월플렉스", category: "storage", xMm: 3_650, yMm: 6_100, widthMm: 400, depthMm: 3_600, rotation: 0, clearanceMm: 900, color: "#e5e3dc" },
+      { id: crypto.randomUUID(), label: "홈카페 테이블", category: "table", xMm: 5_050, yMm: 6_800, widthMm: 800, depthMm: 2_100, rotation: 0, clearanceMm: 450, color: "#cda27f" },
+      { id: crypto.randomUUID(), label: "수납 벤치", category: "seating", xMm: 6_300, yMm: 6_500, widthMm: 600, depthMm: 2_700, rotation: 0, clearanceMm: 450, color: "#879e8e" },
+    ];
+    const setLabels = new Set(nextItems.map((item) => item.label));
+    setItems((current) => [...current.filter((item) => !setLabels.has(item.label)), ...nextItems]);
+    setSelectedId(nextItems[1]?.id ?? null);
+    setDirty(true);
+  }
+
   function updateSelected(patch: Partial<PlannerItem>): void {
     if (!selectedId) return;
     setItems((current) => current.map((item) => {
@@ -327,6 +340,7 @@ export function SpacePlannerView(): ReactNode {
             <aside className="planner-library">
               <div className="planner-panel-heading"><div><span>FURNITURE</span><h2>가구·가전</h2></div><small>{furniturePresets.length}종</small></div>
               <p className="planner-panel-copy">누르면 도면 중앙에 실제 크기로 추가됩니다.</p>
+              <button className="planner-homecafe-set" onClick={addHomeCafeSet} aria-label="블로그 거실 세트 배치"><span>추천 세트</span><strong>TV월 + 테이블 + 벤치</strong><small>거실에 실치수로 한 번에 배치</small></button>
               <div className="planner-presets">{furniturePresets.map((preset) => <button key={preset.label} onClick={() => addPreset(preset)}><span className="planner-preset-icon">{preset.icon}</span><span><strong>{preset.label}</strong><small>{preset.widthMm} × {preset.depthMm}</small></span><Plus size={14} /></button>)}</div>
             </aside>
 

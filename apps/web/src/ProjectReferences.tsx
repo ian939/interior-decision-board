@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import {
   ArrowRight,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
@@ -16,6 +17,8 @@ import {
 type ReferenceTab = "plans" | "concepts" | "brief";
 
 const asset = (path: string): string => `${import.meta.env.BASE_URL}project-assets/${path}`;
+const livingFitVisual = asset("concepts/living-homecafe-fit-v1.png");
+const livingFitSource = "https://blog.naver.com/2n1space/223320590826";
 
 const floorPlans = [
   { src: asset("plans/floorplan-renovation-1.png"), alt: "한신무학 아파트 변경 도면 1", label: "변경 도면 1", caption: "가구 배치 실험실 기준 도면 · 정확한 치수는 현장 실측으로 확정", badge: "배치 기준" },
@@ -148,6 +151,50 @@ export function ProjectReferencesView(): ReactNode {
 
       {tab === "concepts" ? (
         <div className="reference-tab-panel">
+          <section className="living-fit-study">
+            <header className="living-fit-header">
+              <div><span className="reference-overline">LIVING FIT STUDY · BLOG REFERENCE</span><h2>TV월플렉스 + 홈카페 거실 적용 검토</h2><p>변경 도면 1의 거실 약 3,250 × 7,700mm에 블로그의 4개 핵심 요소를 배치했습니다.</p></div>
+              <span className="living-fit-verdict"><CheckCircle2 size={16} />조건부 가능</span>
+            </header>
+            <div className="living-fit-hero">
+              <button onClick={() => setPreview({ src: livingFitVisual, alt: "현재 거실에 TV월플렉스와 홈카페 구성을 적용한 개념 시각화" })}><img src={livingFitVisual} alt="현재 거실에 TV월플렉스와 홈카페 구성을 적용한 개념 시각화" /><span><Maximize2 size={15} /> 크게 보기</span></button>
+              <div className="living-fit-summary">
+                <span className="reference-overline">FIT SUMMARY</span>
+                <h3>길이는 충분하고, 폭은 실측이 핵심입니다.</h3>
+                <p>TV월·통로·테이블·벤치를 폭 방향으로 더하면 약 3,250mm입니다. 현재 도면의 근사 폭과 같아 걸레받이와 가구 제작 오차를 포함한 현장 실측이 필요합니다.</p>
+                <dl><div><dt>현재 거실</dt><dd>약 3,250 × 7,700</dd></div><div><dt>필요 핵심 존</dt><dd>약 3,250 × 5,000</dd></div><div><dt>주동선</dt><dd>900–1,200mm</dd></div><div><dt>테이블–벤치</dt><dd>450–500mm</dd></div></dl>
+                <a href={livingFitSource} target="_blank" rel="noreferrer">참고 블로그 원문 <ExternalLink size={14} /></a>
+              </div>
+            </div>
+            <div className="living-fit-analysis">
+              <div className="living-fit-plan-card">
+                <div><span className="reference-overline">TOP VIEW · APPROX.</span><h3>추천 배치와 필요한 공간</h3></div>
+                <svg className="living-fit-plan" viewBox="-430 -450 4110 8600" role="img" aria-label="거실 3250 곱하기 7700 밀리미터 안에 TV월, 테이블, 수납벤치, 아일랜드를 배치한 도면">
+                  <rect className="living-room-shell" width="3250" height="7700" rx="90" />
+                  <rect className="living-zone-island" x="400" y="300" width="1800" height="800" rx="55" />
+                  <text x="1300" y="720">아일랜드 홈바 · 1,800×800</text>
+                  <rect className="living-main-path" x="0" y="1200" width="3250" height="900" rx="45" />
+                  <text x="1625" y="1730">주동선 900mm 이상</text>
+                  <rect className="living-zone-tv" x="0" y="2200" width="400" height="3600" rx="35" />
+                  <text className="vertical-label" x="205" y="4000" transform="rotate(-90 205 4000)">TV월플렉스 · 깊이 400</text>
+                  <rect className="living-zone-table" x="1400" y="2700" width="800" height="2100" rx="40" />
+                  <text className="vertical-label" x="1800" y="3750" transform="rotate(-90 1800 3750)">테이블 · 2,100×800</text>
+                  <rect className="living-zone-bench" x="2650" y="2400" width="600" height="2700" rx="35" />
+                  <text className="vertical-label" x="2950" y="3750" transform="rotate(-90 2950 3750)">수납벤치 · 깊이 600</text>
+                  <line className="living-gap-line" x1="2200" y1="5100" x2="2650" y2="5100" /><text className="gap-label" x="2425" y="5360">450</text>
+                  <line className="living-gap-line" x1="400" y1="6100" x2="1400" y2="6100" /><text className="gap-label" x="900" y="6360">1,000</text>
+                  <text className="living-balcony-label" x="1625" y="6970">발코니 방향 여유 · 채광</text>
+                  <line className="living-dimension" x1="0" y1="-190" x2="3250" y2="-190" /><text className="living-dimension-label" x="1625" y="-255">3,250mm</text>
+                  <line className="living-dimension" x1="-190" y1="0" x2="-190" y2="7700" /><text className="living-dimension-label" x="-255" y="3850" transform="rotate(-90 -255 3850)">7,700mm</text>
+                </svg>
+              </div>
+              <div className="living-fit-requirements">
+                <span className="reference-overline">REQUIRED CLEARANCE</span><h3>이 구성으로 맞추는 조건</h3>
+                <ol><li><strong>TV월플렉스</strong><span>폭 3,200–3,600 · 깊이 400mm 이하</span></li><li><strong>홈카페 테이블</strong><span>블로그와 동일한 2,100 × 800mm</span></li><li><strong>수납벤치</strong><span>폭 약 2,700 · 깊이 600mm, 테이블 좌석 겸용</span></li><li><strong>의자 구성</strong><span>벤치 반대편 위주로 두어 길이 방향 통로 확보</span></li><li><strong>실측 확인</strong><span>가용 폭이 3,250mm 미만이면 TV장 깊이 또는 테이블 폭 축소</span></li></ol>
+                <div className="living-fit-caution"><strong>판정</strong><p>그대로 복제하기보다 ‘벤치 좌석 + 반대편 의자’로 조정하면 적용 가능성이 높습니다. 정확한 제작 치수는 벽 마감 후 실측으로 확정하세요.</p></div>
+              </div>
+            </div>
+          </section>
           <section className="faucet-focus">
             <div className="faucet-focus-icon"><Focus size={22} /></div>
             <div><span className="reference-overline">PINNED IDEA · KITCHEN</span><h2>인출식 + 폭포수 모드 주방 수전</h2><p>앞으로 뽑아 쓸 수 있고 폭포수 토수 모드가 있는 모델. 인덕션 뒤에는 냄비에 바로 물을 받을 수 있는 포트필러도 함께 검토합니다.</p><div className="reference-chips"><span>인출식</span><span>폭포수 모드</span><span>포트필러</span><span>별도 구매 공제</span></div></div>
