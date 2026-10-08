@@ -6,7 +6,7 @@ import { api } from "./api";
 
 const PLAN_WIDTH = 12_000;
 const PLAN_HEIGHT = 12_550;
-const PLAN_IMAGE = `${import.meta.env.BASE_URL}project-assets/plans/floorplan-structure-boiler.png`;
+const PLAN_IMAGE = `${import.meta.env.BASE_URL}project-assets/plans/floorplan-structure-boiler-partition-1800.png`;
 const DRAWING_VIEWBOX = { x: -2_200, y: -1_800, width: 17_450, height: 15_700 } as const;
 
 type FurniturePreset = {
@@ -429,7 +429,7 @@ export function SpacePlannerView(): ReactNode {
                   </g>
                 </svg>
               </div>
-              <div className="planner-canvas-foot"><span><i className="legend-item" />가구 실크기</span><span><i className="legend-clearance" />선택 가구 통로</span><span><i className="legend-collision" />겹침</span><small>보일러 포함 구조 평면도를 기준으로 가구 배치를 검토합니다.</small></div>
+              <div className="planner-canvas-foot"><span><i className="legend-item" />가구 실크기</span><span><i className="legend-clearance" />선택 가구 통로</span><span><i className="legend-collision" />겹침</span><small>왼쪽 침실 1,800mm 가벽과 보일러가 반영된 구조 평면도를 기준으로 가구 배치를 검토합니다.</small></div>
             </main>
 
             <aside className="planner-inspector">

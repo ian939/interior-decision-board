@@ -38,14 +38,14 @@ try {
   await page.getByRole("heading", { name: "도면과 기존 아이디어" }).waitFor();
   const planAlts = [
     "한신무학 아파트 원래 평면도",
-    "가구 없이 보일러와 안쪽 여닫이문을 표시한 구조 평면도",
+    "왼쪽 침실에 1,800mm 가벽을 표시한 구조 평면도",
     "방문이 안쪽으로 열리고 간접조명과 매립등 위치가 표시된 조명 계획도",
     "방문이 안쪽으로 열리고 조명과 콘센트 제안 위치가 표시된 전기 계획도",
   ];
   for (const alt of planAlts) await page.getByAltText(alt).waitFor();
   const planCards = page.locator(".floorplan-card");
   if (await planCards.count() !== 4) throw new Error("원본·구조·조명·콘센트 도면 4종이 모두 표시되지 않습니다.");
-  const expectedPlanFiles = ["floorplan-final.png", "floorplan-structure-boiler.png", "floorplan-lighting-inward-doors.png", "floorplan-lighting-outlets-inward-doors.png"];
+  const expectedPlanFiles = ["floorplan-final.png", "floorplan-structure-boiler-partition-1800.png", "floorplan-lighting-inward-doors.png", "floorplan-lighting-outlets-inward-doors.png"];
   for (let index = 0; index < expectedPlanFiles.length; index += 1) {
     const src = await planCards.nth(index).locator("img").getAttribute("src");
     if (!src?.includes(expectedPlanFiles[index])) throw new Error(`도면 ${index + 1}의 순서 또는 이미지가 올바르지 않습니다.`);
@@ -75,7 +75,7 @@ try {
   const finalPlanImage = page.locator(".planner-final-plan image");
   await finalPlanImage.waitFor();
   const finalPlanHref = await finalPlanImage.getAttribute("href");
-  if (!finalPlanHref?.includes("floorplan-structure-boiler.png")) throw new Error("보일러 포함 구조 평면도가 배치 실험실에 표시되지 않습니다.");
+  if (!finalPlanHref?.includes("floorplan-structure-boiler-partition-1800.png")) throw new Error("왼쪽 침실 1,800mm 가벽이 반영된 구조 평면도가 배치 실험실에 표시되지 않습니다.");
   if (await page.getByRole("button", { name: /요청 반영안/ }).count()) throw new Error("제거하기로 한 변경안 버튼이 남아 있습니다.");
   if (await page.locator(".floor-plan-vector").count()) throw new Error("폐기한 벡터 변경안이 남아 있습니다.");
   if (await page.getByRole("button", { name: "블로그 거실 세트 배치" }).count()) throw new Error("원복한 블로그 거실 세트 버튼이 남아 있습니다.");
