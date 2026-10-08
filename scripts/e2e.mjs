@@ -36,27 +36,25 @@ try {
   }
   await page.getByRole("button", { name: /도면·아이디어/ }).click();
   await page.getByRole("heading", { name: "도면과 기존 아이디어" }).waitFor();
-  const floorPlan = page.getByAltText("공사 포인트 1번부터 7번이 표시된 공사 도면");
-  await floorPlan.waitFor();
-  const constructionPlanSrc = await floorPlan.getAttribute("src");
-  if (!constructionPlanSrc?.includes("floorplan-construction.png")) throw new Error("2번 이미지가 공사 도면으로 표시되지 않습니다.");
-  if (await page.locator(".renovation-points article").count() !== 7) throw new Error("공사 포인트 1~7 목록이 모두 표시되지 않습니다.");
-  await floorPlan.locator("xpath=..").click();
-  const previewPlan = page.getByRole("dialog").getByAltText("공사 포인트 1번부터 7번이 표시된 공사 도면");
-  await previewPlan.waitFor();
-  await page.getByRole("button", { name: "닫기" }).click();
-  await page.getByRole("heading", { name: "구조에서 전기까지 단계별로 확인" }).waitFor();
-  const drawingVariantAlts = [
+  const planAlts = [
+    "한신무학 아파트 원래 평면도",
     "가구와 조명을 제외한 구조 평면도",
     "간접조명과 매립등 위치가 표시된 조명 계획도",
     "조명과 콘센트 제안 위치가 표시된 전기 계획도",
   ];
-  for (const alt of drawingVariantAlts) await page.getByAltText(alt).waitFor();
-  if (await page.locator(".drawing-variant-card").count() !== 3) throw new Error("구조·조명·콘센트 도면 3종이 모두 표시되지 않습니다.");
-  const outletPlan = page.getByAltText(drawingVariantAlts[2]);
+  for (const alt of planAlts) await page.getByAltText(alt).waitFor();
+  const planCards = page.locator(".floorplan-card");
+  if (await planCards.count() !== 4) throw new Error("원본·구조·조명·콘센트 도면 4종이 모두 표시되지 않습니다.");
+  const expectedPlanFiles = ["floorplan-final.png", "floorplan-structure-only.png", "floorplan-lighting.png", "floorplan-lighting-outlets.png"];
+  for (let index = 0; index < expectedPlanFiles.length; index += 1) {
+    const src = await planCards.nth(index).locator("img").getAttribute("src");
+    if (!src?.includes(expectedPlanFiles[index])) throw new Error(`도면 ${index + 1}의 순서 또는 이미지가 올바르지 않습니다.`);
+  }
+  if (await page.locator(".renovation-points article").count() !== 7) throw new Error("공사 포인트 1~7 목록이 모두 표시되지 않습니다.");
+  const outletPlan = page.getByAltText(planAlts[3]);
   if (!(await outletPlan.getAttribute("src"))?.includes("floorplan-lighting-outlets.png")) throw new Error("조명+콘센트 도면 이미지가 올바르지 않습니다.");
   await outletPlan.locator("xpath=..").click();
-  await page.getByRole("dialog").getByAltText(drawingVariantAlts[2]).waitFor();
+  await page.getByRole("dialog").getByAltText(planAlts[3]).waitFor();
   await page.getByRole("button", { name: "닫기" }).click();
   await page.screenshot({ path: resolve(outputDir, "05-references-plans-desktop.png"), fullPage: true });
   await page.getByRole("button", { name: /디자인·아이디어/ }).click();
@@ -126,7 +124,7 @@ try {
     JSON.stringify(
       {
         ok: true,
-        assertions: ["login", "desktop_board", "card_drawer", "story_image_picker", "card_delete_confirmation", "mobile_board", "reference_renovation_plan", "reference_construction_plan", "reference_construction_points", "reference_drawing_variants", "reference_drawing_variant_preview", "living_fit_visualization", "living_fit_dimensions", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_renovation_plan_1", "space_planner_single_plan", "space_planner_change_variant_removed", "space_planner_homecafe_set", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
+        assertions: ["login", "desktop_board", "card_drawer", "story_image_picker", "card_delete_confirmation", "mobile_board", "reference_plan_grid_order", "reference_plan_grid_preview", "reference_construction_points", "living_fit_visualization", "living_fit_dimensions", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_renovation_plan_1", "space_planner_single_plan", "space_planner_change_variant_removed", "space_planner_homecafe_set", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
         outputDir,
       },
       null,
