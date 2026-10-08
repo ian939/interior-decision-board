@@ -75,7 +75,7 @@ try {
   const finalPlanImage = page.locator(".planner-final-plan image");
   await finalPlanImage.waitFor();
   const finalPlanHref = await finalPlanImage.getAttribute("href");
-  if (!finalPlanHref?.includes("floorplan-renovation-1.png")) throw new Error("변경 도면 1이 배치 실험실에 표시되지 않습니다.");
+  if (!finalPlanHref?.includes("floorplan-structure-boiler.png")) throw new Error("보일러 포함 구조 평면도가 배치 실험실에 표시되지 않습니다.");
   if (await page.getByRole("button", { name: /요청 반영안/ }).count()) throw new Error("제거하기로 한 변경안 버튼이 남아 있습니다.");
   if (await page.locator(".floor-plan-vector").count()) throw new Error("폐기한 벡터 변경안이 남아 있습니다.");
   if (await page.getByRole("button", { name: "블로그 거실 세트 배치" }).count()) throw new Error("원복한 블로그 거실 세트 버튼이 남아 있습니다.");
