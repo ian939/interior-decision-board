@@ -18,7 +18,7 @@ type ReferenceTab = "plans" | "concepts" | "brief";
 const asset = (path: string): string => `${import.meta.env.BASE_URL}project-assets/${path}`;
 const floorPlans = [
   { src: asset("plans/floorplan-final.png"), alt: "한신무학 아파트 원래 평면도", label: "원래 평면도", caption: "변경 전 공간 구성과 주요 외곽 치수를 확인하는 기준 도면", badge: "원본 기준" },
-  { src: asset("plans/floorplan-structure-boiler-partition-1800.png"), alt: "왼쪽 침실의 4㎡·2㎡ 구획을 철거하고 1,800mm 가벽만 표시한 구조 평면도", label: "구조 평면도", caption: "왼쪽 침실의 기존 4㎡·2㎡ 구획과 문을 철거하고, 통합된 공간 상단에서 1,800mm 지점에 가벽 하나만 설치", badge: "구조 검토" },
+  { src: asset("plans/floorplan-structure-boiler-partition-1800.png"), alt: "왼쪽 침실 1,800mm 가벽과 거실 옆 발코니 진입문을 표시한 구조 평면도", label: "구조 평면도", caption: "왼쪽 침실 구획 철거 후 1,800mm 가벽을 설치하고, 거실에서 아래쪽 발코니로 들어가는 안쪽 여닫이문 추가", badge: "구조 검토" },
   { src: asset("plans/floorplan-lighting-inward-doors.png"), alt: "방문이 안쪽으로 열리고 간접조명과 매립등 위치가 표시된 조명 계획도", label: "조명 계획도", caption: "안쪽 여닫이문과 라인조명·매립등·간접등 위치 확인", badge: "조명 검토" },
   { src: asset("plans/floorplan-lighting-outlets-inward-doors.png"), alt: "방문이 안쪽으로 열리고 조명과 콘센트 제안 위치가 표시된 전기 계획도", label: "조명 + 콘센트", caption: "안쪽 여닫이문과 조명·권장 콘센트 위치를 함께 보는 전기 협의용 개념안", badge: "전기 협의" },
 ] as const;
