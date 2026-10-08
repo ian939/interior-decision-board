@@ -25,6 +25,12 @@ const floorPlans = [
   { src: asset("plans/floorplan-construction.png"), alt: "공사 포인트 1번부터 7번이 표시된 공사 도면", label: "공사 도면", caption: "확장·수납·아일랜드 계획 7개 지점", badge: "포인트 1–7" },
 ];
 
+const drawingVariants = [
+  { src: asset("plans/floorplan-structure-only.png"), alt: "가구와 조명을 제외한 구조 평면도", step: "01", label: "구조 평면도", caption: "가구와 조명 기호를 비우고 벽·문·고정 설비만 확인", badge: "구조 검토" },
+  { src: asset("plans/floorplan-lighting.png"), alt: "간접조명과 매립등 위치가 표시된 조명 계획도", step: "02", label: "조명 계획도", caption: "라인조명·매립등·간접등과 공간별 조명 위치 확인", badge: "조명 검토" },
+  { src: asset("plans/floorplan-lighting-outlets.png"), alt: "조명과 콘센트 제안 위치가 표시된 전기 계획도", step: "03", label: "조명 + 콘센트", caption: "조명 계획에 권장 콘센트 위치를 더한 전기 협의용 개념안", badge: "전기 협의" },
+] as const;
+
 const renovationPoints = [
   ["1", "현관 신발장 확장", "붙박이장 설치 · 중문 필요"],
   ["2", "거실 확장", "베란다 방향 공간 확장"],
@@ -123,12 +129,12 @@ export function ProjectReferencesView(): ReactNode {
         <dl>
           <div><dt>공사 범위</dt><dd>빈집 전체 공사</dd></div>
           <div><dt>예상 일정</dt><dd>2026년 7월–9월</dd></div>
-          <div><dt>기준 문서</dt><dd>도면 2종 · 아이디어 18장</dd></div>
+          <div><dt>기준 문서</dt><dd>도면 5종 · 아이디어 18장</dd></div>
         </dl>
       </section>
 
       <nav className="reference-tabs" aria-label="프로젝트 자료 분류">
-        <button className={tab === "plans" ? "active" : ""} onClick={() => setTab("plans")}><Map size={17} /><span>도면·공사 포인트</span><small>2</small></button>
+        <button className={tab === "plans" ? "active" : ""} onClick={() => setTab("plans")}><Map size={17} /><span>도면·공사 포인트</span><small>5</small></button>
         <button className={tab === "concepts" ? "active" : ""} onClick={() => setTab("concepts")}><Images size={17} /><span>디자인·아이디어</span><small>12</small></button>
         <button className={tab === "brief" ? "active" : ""} onClick={() => setTab("brief")}><Grid2X2 size={17} /><span>상세 요청서</span><small>18</small></button>
       </nav>
@@ -142,6 +148,13 @@ export function ProjectReferencesView(): ReactNode {
           <div className="floorplan-grid">
             {floorPlans.map((plan) => <figure className="floorplan-card" key={plan.label}><button onClick={() => setPreview({ src: plan.src, alt: plan.alt })}><img src={plan.src} alt={plan.alt} /><span><Maximize2 size={15} /> 크게 보기</span></button><figcaption><div><strong>{plan.label}</strong><span className="plan-orientation-badge">{plan.badge}</span></div><p>{plan.caption}</p></figcaption></figure>)}
           </div>
+          <section className="drawing-variant-section">
+            <div className="drawing-variant-heading"><div><span className="reference-overline">DRAWING LAYERS · 3 VERSIONS</span><h2>구조에서 전기까지 단계별로 확인</h2><p>같은 구조를 기준으로 필요한 정보만 순서대로 더했습니다.</p></div><span className="drawing-variant-status"><CheckCircle2 size={15} />비교용 도면 3종</span></div>
+            <div className="drawing-variant-grid">
+              {drawingVariants.map((plan) => <figure className="drawing-variant-card" key={plan.label}><button onClick={() => setPreview({ src: plan.src, alt: plan.alt })}><span className="drawing-variant-step">{plan.step}</span><img src={plan.src} alt={plan.alt} /><span className="drawing-variant-zoom"><Maximize2 size={14} /> 확대</span></button><figcaption><div><strong>{plan.label}</strong><span>{plan.badge}</span></div><p>{plan.caption}</p></figcaption></figure>)}
+            </div>
+            <p className="drawing-variant-note">콘센트 위치와 회로는 개념 제안이며, 전기 시공 전 현장 조건과 가구 배치를 기준으로 최종 확정합니다.</p>
+          </section>
           <div className="plan-detail-grid">
             <section className="renovation-points"><div className="reference-card-title"><Ruler size={18} /><div><strong>공사 포인트 7</strong><span>표시 도면 번호와 연결됩니다.</span></div></div>{renovationPoints.map(([number, title, detail]) => <article key={number}><span>{number}</span><div><strong>{title}</strong><p>{detail}</p></div></article>)}</section>
             <section className="common-requirements"><span className="reference-overline">COMMON REQUIREMENTS</span><h3>전체 공간 공통 기준</h3><ul><li>가장 작은 방을 제외한 각 침실 붙박이장</li><li>별도 구매 실링팬 설치</li><li>가장 작은 방을 제외한 시스템 에어컨 4대</li><li>정확한 치수와 구조는 현장 실측 후 확정</li></ul></section>

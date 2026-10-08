@@ -368,6 +368,24 @@ a { color: inherit; }
 .floorplan-card figcaption strong { font-size: 12px; }
 .floorplan-card figcaption p { margin: 4px 0 0; color: var(--ink-soft); font-size: 9px; }
 .plan-orientation-badge { flex: 0 0 auto; padding: 4px 7px; border-radius: 6px; background: var(--sage-pale); color: var(--sage-deep); font-size: 8px; font-weight: 650; }
+.drawing-variant-section { margin-top: 34px; padding: 22px; border: 1px solid var(--line); border-radius: 17px; background: rgba(255,255,255,.66); box-shadow: var(--shadow-sm); }
+.drawing-variant-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 17px; }
+.drawing-variant-heading h2 { margin: 7px 0 5px; font-size: 19px; letter-spacing: -.035em; }
+.drawing-variant-heading p { margin: 0; color: var(--ink-soft); font-size: 9px; }
+.drawing-variant-status { flex: none; min-height: 30px; padding: 0 10px; border: 1px solid #c5d2c6; border-radius: 9px; background: var(--sage-pale); color: var(--sage-deep); display: inline-flex; align-items: center; gap: 6px; font-size: 8px; font-weight: 700; }
+.drawing-variant-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.drawing-variant-card { min-width: 0; margin: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: #fff; }
+.drawing-variant-card > button { width: 100%; aspect-ratio: 16/9; padding: 8px; position: relative; overflow: hidden; border: 0; border-bottom: 1px solid var(--line-light); background: #f4f5f2; cursor: zoom-in; }
+.drawing-variant-card img { width: 100%; height: 100%; display: block; object-fit: contain; transition: transform .25s ease; }
+.drawing-variant-card button:hover img { transform: scale(1.018); }
+.drawing-variant-step { width: 25px; height: 25px; position: absolute; z-index: 1; top: 9px; left: 9px; border-radius: 8px; background: rgba(38,48,42,.88); color: white; display: grid; place-items: center; font-family: "DM Sans",sans-serif; font-size: 8px; font-weight: 750; backdrop-filter: blur(7px); }
+.drawing-variant-zoom { min-height: 25px; padding: 0 8px; position: absolute; z-index: 1; right: 9px; bottom: 9px; border-radius: 7px; background: rgba(38,48,42,.82); color: white; display: inline-flex; align-items: center; gap: 5px; font-size: 8px; backdrop-filter: blur(7px); }
+.drawing-variant-card figcaption { padding: 13px 14px 14px; }
+.drawing-variant-card figcaption > div { display: flex; align-items: center; justify-content: space-between; gap: 9px; }
+.drawing-variant-card figcaption strong { font-size: 11px; }
+.drawing-variant-card figcaption span { flex: none; padding: 4px 7px; border-radius: 6px; background: #f2eee7; color: #8a684e; font-size: 7px; font-weight: 700; }
+.drawing-variant-card figcaption p { min-height: 29px; margin: 6px 0 0; color: var(--ink-soft); font-size: 8px; line-height: 1.55; }
+.drawing-variant-note { margin: 13px 0 0; padding: 10px 12px; border-radius: 9px; background: #fff5e5; color: #8b633a; font-size: 8px; line-height: 1.55; }
 .plan-detail-grid { margin-top: 17px; display: grid; grid-template-columns: 1.35fr .65fr; gap: 15px; }
 .renovation-points, .common-requirements { border: 1px solid var(--line); border-radius: 15px; background: rgba(255,255,255,.65); padding: 20px; }
 .reference-card-title { display: flex; align-items: center; gap: 10px; padding-bottom: 16px; border-bottom: 1px solid var(--line-light); color: var(--sage-deep); }
@@ -753,6 +771,11 @@ a { color: inherit; }
   .reference-section-heading h2 { font-size: 18px; }
   .floorplan-grid, .concept-grid { grid-template-columns: 1fr; }
   .floorplan-card > button { height: 280px; padding: 9px; }
+  .drawing-variant-section { margin-top: 25px; padding: 15px; }
+  .drawing-variant-heading { flex-direction: column; gap: 9px; }
+  .drawing-variant-heading h2 { font-size: 17px; }
+  .drawing-variant-grid { grid-template-columns: 1fr; }
+  .drawing-variant-card figcaption p { min-height: auto; }
   .renovation-points { grid-template-columns: 1fr; }
   .living-fit-study { padding: 15px; }
   .living-fit-header { flex-direction: column; gap: 10px; }
