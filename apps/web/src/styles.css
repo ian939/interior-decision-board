@@ -357,17 +357,11 @@ a { color: inherit; }
 .reference-section-heading > p { color: #969b96; font-size: 9px; margin: 0; }
 .plan-heading-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
 .plan-heading-actions > p { color: #969b96; font-size: 9px; margin: 0; }
-.plan-orientation-control { display: inline-flex; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,.7); }
-.plan-orientation-control button { min-height: 30px; padding: 0 11px; border: 0; border-radius: 7px; background: transparent; color: var(--ink-soft); font-size: 9px; cursor: pointer; }
-.plan-orientation-control button:hover { color: var(--ink); }
-.plan-orientation-control button.active { background: var(--sage-deep); color: white; box-shadow: 0 2px 7px rgba(38,48,42,.16); }
 .floorplan-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 15px; }
 .floorplan-card { margin: 0; border: 1px solid var(--line); border-radius: 15px; background: rgba(255,255,255,.7); overflow: hidden; }
 .floorplan-card > button { width: 100%; height: 390px; position: relative; padding: 16px; border: 0; border-bottom: 1px solid var(--line-light); background: white; cursor: zoom-in; overflow: hidden; }
 .floorplan-card img { width: 100%; height: 100%; display: block; object-fit: contain; transition: transform .25s ease; }
 .floorplan-card button:hover img { transform: scale(1.015); }
-.floorplan-card img.mirrored-plan-image { transform: scaleX(-1); }
-.floorplan-card button:hover img.mirrored-plan-image { transform: scaleX(-1) scale(1.015); }
 .floorplan-card button > span { position: absolute; right: 13px; bottom: 12px; height: 28px; padding: 0 10px; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px; background: rgba(38,48,42,.78); color: white; font-size: 8px; backdrop-filter: blur(7px); }
 .floorplan-card figcaption { padding: 15px 17px 16px; }
 .floorplan-card figcaption > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -438,7 +432,6 @@ a { color: inherit; }
 .brief-thumbnails span { position: absolute; left: 7px; bottom: 6px; height: 17px; min-width: 22px; padding: 0 4px; display: grid; place-items: center; border-radius: 5px; background: rgba(31,37,33,.78); color: white; font-size: 7px; }
 .reference-lightbox { position: fixed; inset: 0; z-index: 140; padding: 45px; background: rgba(23,28,24,.9); backdrop-filter: blur(8px); display: grid; place-items: center; cursor: zoom-out; animation: fadeIn .16s ease; }
 .reference-lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 20px 70px rgba(0,0,0,.35); }
-.reference-lightbox img.mirrored-plan-image { transform: scaleX(-1); }
 .reference-lightbox-close { position: fixed; top: 16px; right: 18px; width: 39px; height: 39px; border-radius: 50%; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.1); color: white; display: grid; place-items: center; cursor: pointer; }
 
 /* Scaled space planner */

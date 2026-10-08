@@ -18,18 +18,18 @@ type ReferenceTab = "plans" | "concepts" | "brief";
 const asset = (path: string): string => `${import.meta.env.BASE_URL}project-assets/${path}`;
 
 const floorPlans = [
-  { src: asset("plans/floorplan-final.png"), alt: "한신무학 아파트 최종 평면도", label: "최종 평면도", caption: "가구 배치 실험실 기준 도면 · 정확한 치수는 현장 실측으로 확정", fixedOrientation: true },
-  { src: asset("plans/floorplan-points.png"), alt: "공사 포인트가 표시된 평면도", label: "공사 포인트 도면", caption: "확장·수납·아일랜드 계획 7개 지점" },
+  { src: asset("plans/floorplan-renovation-1.png"), alt: "한신무학 아파트 변경 도면 1", label: "변경 도면 1", caption: "가구 배치 실험실 기준 도면 · 정확한 치수는 현장 실측으로 확정", badge: "배치 기준" },
+  { src: asset("plans/floorplan-construction.png"), alt: "공사 포인트 1번부터 7번이 표시된 공사 도면", label: "공사 도면", caption: "확장·수납·아일랜드 계획 7개 지점", badge: "포인트 1–7" },
 ];
 
 const renovationPoints = [
   ["1", "현관 신발장 확장", "붙박이장 설치 · 중문 필요"],
-  ["2", "화장실 내부 배치", "확장 없이 변기를 안쪽에 배치"],
-  ["3", "아일랜드 식탁", "주방 작업대와 수납 확장"],
-  ["4", "침실 확장", "주방 옆 침실 공간 재구성"],
+  ["2", "거실 확장", "베란다 방향 공간 확장"],
+  ["3", "침실 확장", "분리벽과 드레스룸 구성"],
+  ["4", "침실 확장", "분리벽과 드레스룸 구성"],
   ["5", "붙박이장 제거 후 출입문", "기존 수납을 없애고 아래쪽 벽에 문 설치"],
-  ["6", "침실 확장", "분리벽과 드레스룸 구성"],
-  ["7", "거실 확장", "베란다 방향 공간 확장"],
+  ["6", "아일랜드 식탁", "주방 작업대와 수납 확장"],
+  ["7", "침실 확장", "보일러실 위치변경(주방 옆 베란다로)"],
 ] as const;
 
 const concepts = [
@@ -71,11 +71,11 @@ const briefGroups = [
   { id: "electric", label: "조명·전기", slides: [17, 18], summary: ["공간별 주백색·전구색 조명 계획", "커튼박스·아일랜드·거울장·화장대 콘센트"] },
 ] as const;
 
-function ImagePreview({ src, alt, mirrored = false, onClose }: { src: string; alt: string; mirrored?: boolean; onClose: () => void }): ReactNode {
+function ImagePreview({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }): ReactNode {
   return (
     <div className="reference-lightbox" role="dialog" aria-modal="true" aria-label={`${alt} 크게 보기`} onClick={onClose}>
       <button className="reference-lightbox-close" onClick={onClose} aria-label="닫기"><X size={21} /></button>
-      <img className={mirrored ? "mirrored-plan-image" : undefined} src={src} alt={alt} onClick={(event) => event.stopPropagation()} />
+      <img src={src} alt={alt} onClick={(event) => event.stopPropagation()} />
     </div>
   );
 }
@@ -84,8 +84,7 @@ export function ProjectReferencesView(): ReactNode {
   const [tab, setTab] = useState<ReferenceTab>("plans");
   const [groupId, setGroupId] = useState("all");
   const [selectedSlide, setSelectedSlide] = useState(7);
-  const [mirroredPlan, setMirroredPlan] = useState(true);
-  const [preview, setPreview] = useState<{ src: string; alt: string; mirrored?: boolean } | null>(null);
+  const [preview, setPreview] = useState<{ src: string; alt: string } | null>(null);
 
   const visibleSlides = useMemo(() => {
     if (groupId === "all") return slideTitles.map((_, index) => index + 1);
@@ -135,19 +134,10 @@ export function ProjectReferencesView(): ReactNode {
         <div className="reference-tab-panel">
           <div className="reference-section-heading plan-section-heading">
             <div><span>01 · FLOOR PLAN</span><h2>도면에서 먼저 확인할 것</h2></div>
-            <div className="plan-heading-actions">
-              <p>도면을 누르면 크게 볼 수 있습니다.</p>
-              <div className="plan-orientation-control" role="group" aria-label="도면 방향">
-                <button className={mirroredPlan ? "active" : ""} type="button" aria-pressed={mirroredPlan} onClick={() => setMirroredPlan(true)}>실제 방향 · 왼쪽 진입</button>
-                <button className={!mirroredPlan ? "active" : ""} type="button" aria-pressed={!mirroredPlan} onClick={() => setMirroredPlan(false)}>원본 방향</button>
-              </div>
-            </div>
+            <div className="plan-heading-actions"><p>도면을 누르면 크게 볼 수 있습니다.</p></div>
           </div>
           <div className="floorplan-grid">
-            {floorPlans.map((plan) => {
-              const shouldMirror = !plan.fixedOrientation && mirroredPlan;
-              return <figure className="floorplan-card" key={plan.label}><button onClick={() => setPreview({ src: plan.src, alt: plan.alt, mirrored: shouldMirror })}><img className={shouldMirror ? "mirrored-plan-image" : undefined} src={plan.src} alt={plan.alt} /><span><Maximize2 size={15} /> 크게 보기</span></button><figcaption><div><strong>{plan.label}</strong><span className="plan-orientation-badge">{plan.fixedOrientation ? "확정 방향" : mirroredPlan ? "좌우 반전 · 현관 왼쪽 진입" : "원본 · 현관 오른쪽 진입"}</span></div><p>{plan.caption}</p></figcaption></figure>;
-            })}
+            {floorPlans.map((plan) => <figure className="floorplan-card" key={plan.label}><button onClick={() => setPreview({ src: plan.src, alt: plan.alt })}><img src={plan.src} alt={plan.alt} /><span><Maximize2 size={15} /> 크게 보기</span></button><figcaption><div><strong>{plan.label}</strong><span className="plan-orientation-badge">{plan.badge}</span></div><p>{plan.caption}</p></figcaption></figure>)}
           </div>
           <div className="plan-detail-grid">
             <section className="renovation-points"><div className="reference-card-title"><Ruler size={18} /><div><strong>공사 포인트 7</strong><span>표시 도면 번호와 연결됩니다.</span></div></div>{renovationPoints.map(([number, title, detail]) => <article key={number}><span>{number}</span><div><strong>{title}</strong><p>{detail}</p></div></article>)}</section>
@@ -182,7 +172,7 @@ export function ProjectReferencesView(): ReactNode {
         </div>
       ) : null}
 
-      {preview ? <ImagePreview src={preview.src} alt={preview.alt} mirrored={preview.mirrored} onClose={() => setPreview(null)} /> : null}
+      {preview ? <ImagePreview src={preview.src} alt={preview.alt} onClose={() => setPreview(null)} /> : null}
     </div>
   );
 }

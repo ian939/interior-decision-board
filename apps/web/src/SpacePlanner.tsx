@@ -6,7 +6,7 @@ import { api } from "./api";
 
 const PLAN_WIDTH = 12_000;
 const PLAN_HEIGHT = 12_550;
-const PLAN_IMAGE = `${import.meta.env.BASE_URL}project-assets/plans/floorplan-final.png`;
+const PLAN_IMAGE = `${import.meta.env.BASE_URL}project-assets/plans/floorplan-renovation-1.png`;
 const DRAWING_VIEWBOX = { x: -2_200, y: -1_800, width: 17_450, height: 15_700 } as const;
 
 type FurniturePreset = {
@@ -37,12 +37,12 @@ const furniturePresets: FurniturePreset[] = [
 ];
 
 const roomGuides = [
-  { id: "room-1", label: "방 1", x: 250, y: 1_300, width: 3_400, depth: 3_450 },
+  { id: "room-1", label: "방 1", x: 100, y: 300, width: 3_450, depth: 4_250 },
   { id: "kitchen", label: "주방", x: 3_750, y: 800, width: 2_750, depth: 2_650 },
   { id: "room-2", label: "방 2", x: 8_650, y: 1_350, width: 2_950, depth: 3_450 },
   { id: "bath-1", label: "화장실 1", x: 300, y: 5_200, width: 1_900, depth: 1_850 },
-  { id: "living", label: "거실", x: 3_650, y: 4_700, width: 2_800, depth: 6_300 },
-  { id: "room-3", label: "방 3", x: 250, y: 7_050, width: 3_350, depth: 4_200 },
+  { id: "living", label: "거실", x: 3_650, y: 4_700, width: 3_250, depth: 7_700 },
+  { id: "room-3", label: "방 3", x: 100, y: 7_050, width: 3_450, depth: 5_400 },
   { id: "bath-2", label: "화장실 2", x: 6_650, y: 4_350, width: 1_950, depth: 1_450 },
   { id: "room-4", label: "방 4", x: 7_050, y: 7_050, width: 2_300, depth: 3_350 },
   { id: "entry", label: "현관", x: 10_100, y: 5_050, width: 1_450, depth: 1_900 },
@@ -373,7 +373,7 @@ export function SpacePlannerView(): ReactNode {
                   </g>
                 </svg>
               </div>
-              <div className="planner-canvas-foot"><span><i className="legend-item" />가구 실크기</span><span><i className="legend-clearance" />선택 가구 통로</span><span><i className="legend-collision" />겹침</span><small>확정한 최종 평면도 한 장을 기준으로 가구 배치를 검토합니다.</small></div>
+              <div className="planner-canvas-foot"><span><i className="legend-item" />가구 실크기</span><span><i className="legend-clearance" />선택 가구 통로</span><span><i className="legend-collision" />겹침</span><small>변경 도면 1을 기준으로 가구 배치를 검토합니다.</small></div>
             </main>
 
             <aside className="planner-inspector">

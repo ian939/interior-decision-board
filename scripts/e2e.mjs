@@ -36,17 +36,14 @@ try {
   }
   await page.getByRole("button", { name: /도면·아이디어/ }).click();
   await page.getByRole("heading", { name: "도면과 기존 아이디어" }).waitFor();
-  const floorPlan = page.getByAltText("공사 포인트가 표시된 평면도");
+  const floorPlan = page.getByAltText("공사 포인트 1번부터 7번이 표시된 공사 도면");
   await floorPlan.waitFor();
-  if (!(await floorPlan.evaluate((image) => image.classList.contains("mirrored-plan-image")))) throw new Error("도면이 실제 방향(좌우 반전)으로 열리지 않았습니다.");
-  await page.getByRole("button", { name: "원본 방향" }).click();
-  if (await floorPlan.evaluate((image) => image.classList.contains("mirrored-plan-image"))) throw new Error("원본 방향 전환이 적용되지 않았습니다.");
-  await page.getByRole("button", { name: /실제 방향/ }).click();
-  if (!(await floorPlan.evaluate((image) => image.classList.contains("mirrored-plan-image")))) throw new Error("실제 방향 복원이 적용되지 않았습니다.");
+  const constructionPlanSrc = await floorPlan.getAttribute("src");
+  if (!constructionPlanSrc?.includes("floorplan-construction.png")) throw new Error("2번 이미지가 공사 도면으로 표시되지 않습니다.");
+  if (await page.locator(".renovation-points article").count() !== 7) throw new Error("공사 포인트 1~7 목록이 모두 표시되지 않습니다.");
   await floorPlan.locator("xpath=..").click();
-  const previewPlan = page.getByRole("dialog").getByAltText("공사 포인트가 표시된 평면도");
+  const previewPlan = page.getByRole("dialog").getByAltText("공사 포인트 1번부터 7번이 표시된 공사 도면");
   await previewPlan.waitFor();
-  if (!(await previewPlan.evaluate((image) => image.classList.contains("mirrored-plan-image")))) throw new Error("확대 보기에서 실제 방향이 유지되지 않았습니다.");
   await page.getByRole("button", { name: "닫기" }).click();
   await page.screenshot({ path: resolve(outputDir, "05-references-plans-desktop.png"), fullPage: true });
   await page.getByRole("button", { name: /디자인·아이디어/ }).click();
@@ -66,7 +63,7 @@ try {
   const finalPlanImage = page.locator(".planner-final-plan image");
   await finalPlanImage.waitFor();
   const finalPlanHref = await finalPlanImage.getAttribute("href");
-  if (!finalPlanHref?.includes("floorplan-final.png")) throw new Error("확정한 최종 평면도가 배치 실험실에 표시되지 않습니다.");
+  if (!finalPlanHref?.includes("floorplan-renovation-1.png")) throw new Error("변경 도면 1이 배치 실험실에 표시되지 않습니다.");
   if (await page.getByRole("button", { name: /요청 반영안/ }).count()) throw new Error("제거하기로 한 변경안 버튼이 남아 있습니다.");
   if (await page.locator(".floor-plan-vector").count()) throw new Error("폐기한 벡터 변경안이 남아 있습니다.");
   await page.screenshot({ path: resolve(outputDir, "09-space-planner-final-plan.png"), fullPage: true });
@@ -108,7 +105,7 @@ try {
     JSON.stringify(
       {
         ok: true,
-        assertions: ["login", "desktop_board", "card_drawer", "story_image_picker", "card_delete_confirmation", "mobile_board", "reference_plans", "reference_plan_orientation", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_final_plan", "space_planner_single_plan", "space_planner_change_variant_removed", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
+        assertions: ["login", "desktop_board", "card_drawer", "story_image_picker", "card_delete_confirmation", "mobile_board", "reference_renovation_plan", "reference_construction_plan", "reference_construction_points", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_renovation_plan_1", "space_planner_single_plan", "space_planner_change_variant_removed", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
         outputDir,
       },
       null,
