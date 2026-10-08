@@ -429,7 +429,7 @@ export function SpacePlannerView(): ReactNode {
                   </g>
                 </svg>
               </div>
-              <div className="planner-canvas-foot"><span><i className="legend-item" />가구 실크기</span><span><i className="legend-clearance" />선택 가구 통로</span><span><i className="legend-collision" />겹침</span><small>왼쪽 침실 1,800mm 가벽과 보일러가 반영된 구조 평면도를 기준으로 가구 배치를 검토합니다.</small></div>
+              <div className="planner-canvas-foot"><span><i className="legend-item" />가구 실크기</span><span><i className="legend-clearance" />선택 가구 통로</span><span><i className="legend-collision" />겹침</span><small>왼쪽 침실 구획 철거 후 1,800mm 가벽과 보일러가 반영된 구조 평면도를 기준으로 검토합니다.</small></div>
             </main>
 
             <aside className="planner-inspector">
