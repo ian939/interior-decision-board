@@ -18,9 +18,9 @@ type ReferenceTab = "plans" | "concepts" | "brief";
 const asset = (path: string): string => `${import.meta.env.BASE_URL}project-assets/${path}`;
 const floorPlans = [
   { src: asset("plans/floorplan-final.png"), alt: "한신무학 아파트 원래 평면도", label: "원래 평면도", caption: "변경 전 공간 구성과 주요 외곽 치수를 확인하는 기준 도면", badge: "원본 기준" },
-  { src: asset("plans/floorplan-structure-only.png"), alt: "가구와 조명을 제외한 구조 평면도", label: "구조 평면도", caption: "가구와 조명 기호를 비우고 벽·문·고정 설비만 확인", badge: "구조 검토" },
-  { src: asset("plans/floorplan-lighting.png"), alt: "간접조명과 매립등 위치가 표시된 조명 계획도", label: "조명 계획도", caption: "라인조명·매립등·간접등과 공간별 조명 위치 확인", badge: "조명 검토" },
-  { src: asset("plans/floorplan-lighting-outlets.png"), alt: "조명과 콘센트 제안 위치가 표시된 전기 계획도", label: "조명 + 콘센트", caption: "조명 계획에 권장 콘센트 위치를 더한 전기 협의용 개념안", badge: "전기 협의" },
+  { src: asset("plans/floorplan-structure-inward-doors.png"), alt: "모든 방문이 방 안쪽으로 열리는 구조 평면도", label: "구조 평면도", caption: "가구와 조명 기호를 비우고 벽·안쪽 여닫이문·고정 설비만 확인", badge: "구조 검토" },
+  { src: asset("plans/floorplan-lighting-inward-doors.png"), alt: "방문이 안쪽으로 열리고 간접조명과 매립등 위치가 표시된 조명 계획도", label: "조명 계획도", caption: "안쪽 여닫이문과 라인조명·매립등·간접등 위치 확인", badge: "조명 검토" },
+  { src: asset("plans/floorplan-lighting-outlets-inward-doors.png"), alt: "방문이 안쪽으로 열리고 조명과 콘센트 제안 위치가 표시된 전기 계획도", label: "조명 + 콘센트", caption: "안쪽 여닫이문과 조명·권장 콘센트 위치를 함께 보는 전기 협의용 개념안", badge: "전기 협의" },
 ] as const;
 
 const renovationPoints = [
