@@ -58,11 +58,7 @@ try {
   await page.getByRole("button", { name: "닫기" }).click();
   await page.screenshot({ path: resolve(outputDir, "05-references-plans-desktop.png"), fullPage: true });
   await page.getByRole("button", { name: /디자인·아이디어/ }).click();
-  await page.getByRole("heading", { name: "TV월플렉스 + 홈카페 거실 적용 검토" }).waitFor();
-  const livingFitVisual = page.getByAltText("현재 거실에 TV월플렉스와 홈카페 구성을 적용한 개념 시각화");
-  await livingFitVisual.waitFor();
-  if (!(await livingFitVisual.getAttribute("src"))?.includes("living-homecafe-fit-v1.png")) throw new Error("거실 적용 시각화가 표시되지 않습니다.");
-  await page.getByText("약 3,250 × 5,000", { exact: true }).waitFor();
+  if (await page.getByRole("heading", { name: "TV월플렉스 + 홈카페 거실 적용 검토" }).count()) throw new Error("원복한 거실 적용 검토가 남아 있습니다.");
   await page.getByRole("heading", { name: "인출식 + 폭포수 모드 주방 수전" }).waitFor();
   await page.screenshot({ path: resolve(outputDir, "06-references-ideas-desktop.png"), fullPage: true });
   await page.getByRole("button", { name: /슬라이드 7 보기/ }).click();
@@ -82,10 +78,7 @@ try {
   if (!finalPlanHref?.includes("floorplan-renovation-1.png")) throw new Error("변경 도면 1이 배치 실험실에 표시되지 않습니다.");
   if (await page.getByRole("button", { name: /요청 반영안/ }).count()) throw new Error("제거하기로 한 변경안 버튼이 남아 있습니다.");
   if (await page.locator(".floor-plan-vector").count()) throw new Error("폐기한 벡터 변경안이 남아 있습니다.");
-  await page.getByRole("button", { name: "블로그 거실 세트 배치" }).click();
-  await page.locator(".planner-item").filter({ hasText: "홈카페 테이블" }).waitFor();
-  if (await page.locator(".planner-item").filter({ hasText: /TV 월플렉스|홈카페 테이블|수납 벤치/ }).count() !== 3) throw new Error("추천 거실 세트 3개가 실치수로 배치되지 않았습니다.");
-  await page.screenshot({ path: resolve(outputDir, "09-space-planner-final-plan.png"), fullPage: true });
+  if (await page.getByRole("button", { name: "블로그 거실 세트 배치" }).count()) throw new Error("원복한 블로그 거실 세트 버튼이 남아 있습니다.");
   await layoutName.fill("E2E 배치안");
   await page.getByRole("button", { name: /3인 소파/ }).click();
   await page.getByRole("button", { name: /식탁 4인/ }).click();
@@ -124,7 +117,7 @@ try {
     JSON.stringify(
       {
         ok: true,
-        assertions: ["login", "desktop_board", "card_drawer", "story_image_picker", "card_delete_confirmation", "mobile_board", "reference_plan_grid_order", "reference_plan_grid_preview", "reference_construction_points", "living_fit_visualization", "living_fit_dimensions", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_renovation_plan_1", "space_planner_single_plan", "space_planner_change_variant_removed", "space_planner_homecafe_set", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
+        assertions: ["login", "desktop_board", "card_drawer", "story_image_picker", "card_delete_confirmation", "mobile_board", "reference_plan_grid_order", "reference_plan_grid_preview", "reference_construction_points", "living_fit_removed", "reference_ideas", "reference_brief", "reference_mobile", "space_planner_create", "space_planner_renovation_plan_1", "space_planner_single_plan", "space_planner_change_variant_removed", "space_planner_homecafe_removed", "space_planner_edit", "space_planner_collision", "space_planner_clearance", "space_planner_save", "space_planner_delete", "space_planner_mobile"],
         outputDir,
       },
       null,

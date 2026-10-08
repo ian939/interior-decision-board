@@ -385,50 +385,6 @@ a { color: inherit; }
 .common-requirements ul { list-style: none; padding: 0; margin: 0; }
 .common-requirements li { position: relative; padding: 11px 0 11px 18px; border-bottom: 1px solid rgba(255,255,255,.1); color: rgba(247,244,236,.72); font-size: 9px; line-height: 1.55; }
 .common-requirements li::before { content: "◆"; position: absolute; left: 1px; top: 13px; color: #d2aa88; font-size: 6px; }
-.living-fit-study { margin-bottom: 38px; border: 1px solid var(--line); border-radius: 18px; padding: 23px; background: rgba(255,255,255,.68); box-shadow: var(--shadow-sm); }
-.living-fit-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 22px; margin-bottom: 17px; }
-.living-fit-header h2 { margin: 7px 0 5px; font-size: 21px; letter-spacing: -.035em; }
-.living-fit-header p { margin: 0; color: var(--ink-soft); font-size: 10px; line-height: 1.6; }
-.living-fit-verdict { flex: none; min-height: 32px; padding: 0 11px; border-radius: 9px; border: 1px solid #bdcdbf; background: var(--sage-pale); color: var(--sage-deep); display: inline-flex; align-items: center; gap: 6px; font-size: 9px; font-weight: 750; }
-.living-fit-hero { display: grid; grid-template-columns: minmax(0,1.55fr) minmax(280px,.7fr); gap: 14px; }
-.living-fit-hero > button { min-height: 420px; padding: 0; border: 0; border-radius: 14px; position: relative; overflow: hidden; background: #e8e3da; cursor: zoom-in; }
-.living-fit-hero > button img { width: 100%; height: 100%; position: absolute; inset: 0; display: block; object-fit: cover; transition: transform .25s ease; }
-.living-fit-hero > button:hover img { transform: scale(1.012); }
-.living-fit-hero > button > span { position: absolute; right: 12px; bottom: 12px; min-height: 29px; padding: 0 10px; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px; background: rgba(38,48,42,.8); color: white; font-size: 8px; }
-.living-fit-summary { padding: 22px; border-radius: 14px; background: #303d35; color: #f8f4ec; }
-.living-fit-summary h3 { margin: 8px 0 8px; font-size: 18px; line-height: 1.35; }
-.living-fit-summary > p { margin: 0; color: rgba(248,244,236,.68); font-size: 9px; line-height: 1.7; }
-.living-fit-summary dl { margin: 18px 0; display: grid; grid-template-columns: repeat(2,1fr); border: 1px solid rgba(255,255,255,.12); }
-.living-fit-summary dl div { min-height: 58px; padding: 10px; border-right: 1px solid rgba(255,255,255,.1); border-bottom: 1px solid rgba(255,255,255,.1); display: flex; flex-direction: column; justify-content: center; }
-.living-fit-summary dt { color: rgba(248,244,236,.5); font-size: 7px; }
-.living-fit-summary dd { margin: 4px 0 0; font-size: 9px; font-weight: 750; }
-.living-fit-summary a { color: #e2bea0; display: inline-flex; align-items: center; gap: 6px; font-size: 9px; text-decoration: none; }
-.living-fit-analysis { margin-top: 14px; display: grid; grid-template-columns: minmax(360px,.72fr) minmax(0,1.28fr); gap: 14px; }
-.living-fit-plan-card, .living-fit-requirements { border: 1px solid var(--line); border-radius: 14px; padding: 18px; background: #f8f7f2; }
-.living-fit-plan-card h3, .living-fit-requirements h3 { margin: 6px 0 12px; font-size: 15px; }
-.living-fit-plan { width: 100%; height: 475px; display: block; }
-.living-room-shell { fill: #f4efe5; stroke: #324239; stroke-width: 70; }
-.living-fit-plan text { fill: #25362c; font-size: 155px; font-weight: 750; text-anchor: middle; dominant-baseline: middle; }
-.living-zone-island { fill: #d1ab7d; stroke: #815f3d; stroke-width: 28; }
-.living-main-path { fill: rgba(104,136,112,.12); stroke: #78917e; stroke-width: 20; stroke-dasharray: 70 40; }
-.living-zone-tv { fill: #e4e3df; stroke: #606b64; stroke-width: 28; }
-.living-zone-table { fill: #d7b183; stroke: #876441; stroke-width: 28; }
-.living-zone-bench { fill: #889b8e; stroke: #52665a; stroke-width: 28; }
-.living-fit-plan .vertical-label { fill: #26372d; font-size: 145px; }
-.living-gap-line, .living-dimension { stroke: #9b6d43; stroke-width: 24; stroke-dasharray: 55 32; }
-.living-fit-plan .gap-label { fill: #8d5d36; font-size: 130px; }
-.living-fit-plan .living-balcony-label { fill: #718077; font-size: 150px; }
-.living-fit-plan .living-dimension { stroke: #4d6054; stroke-dasharray: none; }
-.living-fit-plan .living-dimension-label { fill: #394d40; font-size: 145px; }
-.living-fit-requirements ol { margin: 0; padding: 0; list-style: none; }
-.living-fit-requirements li { min-height: 54px; padding: 9px 0; border-bottom: 1px solid var(--line-light); display: grid; grid-template-columns: 28px 150px 1fr; gap: 10px; align-items: center; counter-increment: fit-step; }
-.living-fit-requirements ol { counter-reset: fit-step; }
-.living-fit-requirements li::before { content: counter(fit-step); width: 25px; height: 25px; border-radius: 50%; display: grid; place-items: center; background: var(--sage-pale); color: var(--sage-deep); font-size: 8px; font-weight: 800; }
-.living-fit-requirements li strong { font-size: 10px; }
-.living-fit-requirements li span { color: var(--ink-soft); font-size: 9px; line-height: 1.5; }
-.living-fit-caution { margin-top: 15px; padding: 13px 14px; border-radius: 10px; background: #fff2dd; color: #7e6039; }
-.living-fit-caution strong { font-size: 9px; }
-.living-fit-caution p { margin: 4px 0 0; font-size: 9px; line-height: 1.6; }
 .faucet-focus { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 17px; margin-bottom: 38px; border: 1px solid #d9c9b9; border-radius: 16px; padding: 20px 22px; background: linear-gradient(115deg,#f8f1e8,#f4ede3); }
 .faucet-focus-icon { width: 45px; height: 45px; border-radius: 13px; background: #ead8c6; color: #9a5c3e; display: grid; place-items: center; }
 .faucet-focus h2 { margin: 6px 0 5px; font-size: 17px; letter-spacing: -.03em; }
@@ -518,11 +474,6 @@ a { color: inherit; }
 .planner-panel-heading h2 { margin: 4px 0 0; font-size: 14px; }
 .planner-panel-heading > small { min-width: 23px; height: 23px; border-radius: 50%; background: var(--sage-pale); color: var(--sage-deep); display: grid; place-items: center; font-size: 8px; }
 .planner-panel-copy { margin: 6px 0 13px; color: var(--ink-soft); font-size: 8px; line-height: 1.55; }
-.planner-homecafe-set { width: 100%; margin-bottom: 9px; padding: 9px 10px; border: 1px solid #c7d4c8; border-radius: 10px; background: linear-gradient(135deg,#e8f0e8,#f6f2e9); color: var(--ink); text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 3px; }
-.planner-homecafe-set:hover { border-color: var(--sage); box-shadow: var(--shadow-sm); }
-.planner-homecafe-set > span { color: var(--terracotta); font-family: "DM Sans",sans-serif; font-size: 7px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-.planner-homecafe-set strong { font-size: 9px; }
-.planner-homecafe-set small { color: var(--ink-soft); font-size: 7px; }
 .planner-presets { display: flex; flex-direction: column; gap: 5px; max-height: 680px; overflow-y: auto; padding-right: 2px; scrollbar-width: thin; }
 .planner-presets button { width: 100%; min-height: 47px; padding: 6px 7px; border: 1px solid var(--line-light); border-radius: 9px; background: #fbfaf7; display: grid; grid-template-columns: 29px minmax(0,1fr) auto; align-items: center; gap: 7px; text-align: left; cursor: pointer; transition: .15s ease; }
 .planner-presets button:hover { border-color: #b9c5b8; background: var(--sage-pale); transform: translateX(2px); }
@@ -754,15 +705,6 @@ a { color: inherit; }
   .floorplan-grid, .concept-grid { grid-template-columns: 1fr; }
   .floorplan-card > button { height: 280px; padding: 9px; }
   .renovation-points { grid-template-columns: 1fr; }
-  .living-fit-study { padding: 15px; }
-  .living-fit-header { flex-direction: column; gap: 10px; }
-  .living-fit-hero, .living-fit-analysis { grid-template-columns: 1fr; }
-  .living-fit-hero > button { min-height: 240px; }
-  .living-fit-summary { padding: 17px; }
-  .living-fit-plan-card, .living-fit-requirements { padding: 15px; }
-  .living-fit-plan { height: 420px; }
-  .living-fit-requirements li { grid-template-columns: 27px 1fr; }
-  .living-fit-requirements li span { grid-column: 2; }
   .faucet-focus { grid-template-columns: auto 1fr; padding: 17px; }
   .faucet-focus .primary-button { grid-column: 1/-1; width: 100%; }
   .concept-reference-card > button { height: 230px; }
