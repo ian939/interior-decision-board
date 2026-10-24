@@ -202,12 +202,28 @@ try {
         break
       }
 
+      # cloudflared가 살아 있어도 주소가 죽을 수 있어 외부 주소를 1분마다 확인한다.
+      $RemoteFailures = 0
+      $NextRemoteCheck = (Get-Date).AddSeconds(60)
       while (-not $Server.HasExited -and -not $Tunnel.HasExited) {
         Invoke-DailyBackup
+        if ((Get-Date) -ge $NextRemoteCheck) {
+          $NextRemoteCheck = (Get-Date).AddSeconds(60)
+          try {
+            $null = Invoke-RestMethod -Uri "$($Quick.Url)/api/health" -TimeoutSec 10
+            $RemoteFailures = 0
+          } catch {
+            $RemoteFailures += 1
+          }
+          if ($RemoteFailures -ge 3) {
+            Write-SupervisorLog "Quick Tunnel 주소가 3회 연속 응답하지 않아 새 주소로 다시 연결합니다: $($Quick.Url)"
+            break
+          }
+        }
         Start-Sleep -Seconds 5
       }
       if (-not $Server.HasExited) {
-        Write-SupervisorLog 'Quick Tunnel이 종료되어 5초 후 새 주소로 다시 연결합니다.'
+        if ($Tunnel.HasExited) { Write-SupervisorLog 'Quick Tunnel이 종료되어 5초 후 새 주소로 다시 연결합니다.' }
         Start-Sleep -Seconds 5
       }
     } catch {
